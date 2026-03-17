@@ -1,0 +1,71 @@
+{
+  "header": {
+    "wallet": "0x4B...A89f"
+  },
+  "nav": {
+    "stake": "质押",
+    "team": "团队",
+    "news": "公告",
+    "mine": "我的"
+  },
+  "stake": {
+    "networkStaked": "全网 RX 锁仓数量",
+    "stakeAmount": "质押数量",
+    "minPlaceholder": "最低 3,000",
+    "walletBalance": "钱包余额",
+    "lockPeriod": "锁仓周期",
+    "dailyYield": "日收益率",
+    "entryFee": "入场费",
+    "estReturns": "预计总收益",
+    "confirmStake": "确认质押",
+    "stakeSuccess": "质押成功！",
+    "announcementBanner": "系统升级完成，Shadow Layer V2 现已上线。"
+  },
+  "team": {
+    "myLevel": "我的等级",
+    "totalVol": "总业绩",
+    "direct": "直推",
+    "community": "社区",
+    "joined": "加入时间",
+    "downline": "下线"
+  },
+  "news": {
+    "title": "公告",
+    "announcement": "公告详情",
+    "items": [
+      {
+        "date": "2026年2月26日",
+        "title": "RobotX Shadow Layer V2 已上线",
+        "summary": "我们很高兴宣布 V2 升级已完成。此次更新带来了 Gas 大幅优化及全新的链上 10 级推荐社区追踪...",
+        "body": "我们很高兴宣布 V2 升级已完成。此次更新带来了 Gas 大幅优化及全新的链上 10 级推荐社区追踪功能。立即质押体验速度提升。"
+      },
+      {
+        "date": "2026年1月15日",
+        "title": "日收益率调整公告",
+        "summary": "为确保 RobotX 生态系统的长期可持续性，90 天质押池收益率将于下月起从 0.8% 调整为 0.73%...",
+        "body": "为确保 RobotX 生态系统的长期可持续性，90 天质押池收益率将于下月起从 0.8% 调整至 0.73%。"
+      }
+    ]
+  },
+  "mine": {
+    "totalAsset": "总资产价值",
+    "marquee": "欢迎来到 RobotX Shadow Layer！立即质押 RX，赚取每日收益，建立您的 10 级网络。",
+    "inviter": "邀请人（上级）",
+    "enterUpline": "输入上级地址 0x...",
+    "bind": "绑定",
+    "bound": "已绑定",
+    "invalidAddress": "请输入有效地址",
+    "bindSuccess": "绑定邀请人成功！",
+    "myOrders": "我的订单",
+    "active": "进行中",
+    "days": "天",
+    "initialStake": "初始质押",
+    "currentValue": "当前价值",
+    "unlocksIn": "解锁剩余",
+    "earned": "已赚取",
+    "officialWebsite": "官方网站",
+    "blockExplorer": "区块浏览器",
+    "smartContract": "智能合约",
+    "version": "RobotX Network v2.0"
+  }
+}

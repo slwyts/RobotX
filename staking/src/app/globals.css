@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --font-outfit: "Outfit", sans-serif;
+  --font-rajdhani: "Rajdhani", sans-serif;
+  --font-orbitron: "Orbitron", sans-serif;
+
+  --color-light-bg: #F0F4F8;
+  --color-light-panel: rgba(255, 255, 255, 0.75);
+  --color-light-textMain: #1A202C;
+  --color-light-textMuted: #64748B;
+  --color-light-border: rgba(0, 0, 0, 0.06);
+  --color-light-input: rgba(241, 245, 249, 0.8);
+  --color-light-nav: rgba(255, 255, 255, 0.9);
+  --color-light-ray: rgba(0, 102, 255, 0.04);
+
+  --color-dark-bg: #020611;
+  --color-dark-panel: rgba(10, 17, 36, 0.65);
+  --color-dark-textMain: #FFFFFF;
+  --color-dark-textMuted: #8E9EBC;
+  --color-dark-border: rgba(255, 255, 255, 0.08);
+  --color-dark-input: rgba(0, 0, 0, 0.4);
+  --color-dark-nav: rgba(2, 6, 17, 0.85);
+  --color-dark-ray: #05163D;
+
+  --color-primary: #00E5FF;
+  --color-primaryDark: #0077FF;
+  --color-brandLight: #0066FF;
+  --color-success: #00FFA3;
+  --color-danger: #FF3366;
+  --color-dangerLight: #E11D48;
+  --color-successLight: #059669;
+
+  --shadow-panel-dark: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-panel-light: 0 10px 40px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 5px 15px rgba(0, 102, 255, 0.3);
+
+  --animate-slide-up: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-pulse-ray: pulseRay 6s infinite ease-in-out;
+  --animate-marquee: marquee 15s linear infinite;
+
+  @keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(15px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulseRay {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.02); opacity: 1; }
+  }
+  @keyframes marquee {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+}
+
+/* Hide scrollbar */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* SVG ray transform origin */
+.hero-path { transform-origin: center center; }
+
+body {
+  transition: background-color 0.5s, color 0.5s;
+  -webkit-tap-highlight-color: transparent;
+}

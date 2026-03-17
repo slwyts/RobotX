@@ -1,0 +1,71 @@
+{
+  "header": {
+    "wallet": "0x4B...A89f"
+  },
+  "nav": {
+    "stake": "Stake",
+    "team": "Team",
+    "news": "News",
+    "mine": "Mine"
+  },
+  "stake": {
+    "networkStaked": "Network RX Staked",
+    "stakeAmount": "Stake Amount",
+    "minPlaceholder": "Min 3,000",
+    "walletBalance": "Balance",
+    "lockPeriod": "Lock Period",
+    "dailyYield": "Daily Yield",
+    "entryFee": "Entry Fee",
+    "estReturns": "Est. Total Returns",
+    "confirmStake": "CONFIRM STAKE",
+    "stakeSuccess": "Staked successfully!",
+    "announcementBanner": "System upgrade completed. Shadow Layer V2 is now live."
+  },
+  "team": {
+    "myLevel": "My Level",
+    "totalVol": "Total Vol.",
+    "direct": "Direct",
+    "community": "Community",
+    "joined": "Joined",
+    "downline": "Downline"
+  },
+  "news": {
+    "title": "News",
+    "announcement": "Announcement",
+    "items": [
+      {
+        "date": "2026.2",
+        "title": "RobotX Shadow Layer V2 is Live",
+        "summary": "We are thrilled to announce that the V2 upgrade is complete. This update brings massive gas optimizations...",
+        "body": "We are thrilled to announce that the V2 upgrade is complete. This update brings massive gas optimizations and the new 10-level referral community tracking directly on-chain. Stake now to experience the speed."
+      },
+      {
+        "date": "2026.1",
+        "title": "Adjustment on Daily Yield Rates",
+        "summary": "To ensure long-term sustainability of the ecosystem, the 90-day pool yield will be adjusted...",
+        "body": "To ensure long-term sustainability of the RobotX ecosystem, the 90-day staking pool yield will be adjusted from 0.8% to 0.73% starting next month."
+      }
+    ]
+  },
+  "mine": {
+    "totalAsset": "Total Asset Value",
+    "marquee": "Welcome to RobotX Shadow Layer! Start staking RX today to earn daily yields and build your 10-level network.",
+    "inviter": "Inviter (Upline)",
+    "enterUpline": "Enter Upline 0x...",
+    "bind": "BIND",
+    "bound": "Bound",
+    "invalidAddress": "Please enter a valid address.",
+    "bindSuccess": "Upline bound successfully!",
+    "myOrders": "My Orders",
+    "active": "Active",
+    "days": "Days",
+    "initialStake": "Initial Stake",
+    "currentValue": "Current Value",
+    "unlocksIn": "Unlocks In",
+    "earned": "Earned",
+    "officialWebsite": "Official Website",
+    "blockExplorer": "Block Explorer",
+    "smartContract": "Smart Contract",
+    "version": "RobotX Network v2.0"
+  }
+}
