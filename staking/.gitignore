@@ -19,6 +19,8 @@
 
 # production
 /build
+/artifacts
+/cache
 
 # misc
 .DS_Store
