@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { Header } from "@/components/header";
 import { BottomNav } from "@/components/bottom-nav";
 import { ParticleBg } from "@/components/particle-bg";
@@ -17,14 +16,18 @@ import { AdminTab } from "@/components/tabs/admin-tab";
 export type TabId = "stake" | "team" | "news" | "mine" | "admin";
 
 export default function HomePage() {
-  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabId>("stake");
 
   useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.get("ref")) {
       setActiveTab("mine");
     }
-  }, [searchParams]);
+  }, []);
 
   return (
     <WalletProvider>

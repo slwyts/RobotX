@@ -1,4 +1,5 @@
 import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { ThemeProvider } from "next-themes";
 import { Outfit, Rajdhani, Orbitron } from "next/font/google";
@@ -22,6 +23,12 @@ const orbitron = Orbitron({
   weight: ["700", "900"],
 });
 
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export const dynamicParams = false;
+
 export default async function LocaleLayout({
   children,
   params,
@@ -31,6 +38,8 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
+
+  setRequestLocale(locale);
 
   const messages = (await import(`@/messages/${locale}.json`)).default;
 
