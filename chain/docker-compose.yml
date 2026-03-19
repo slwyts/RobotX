@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  nethermind:
+    image: nethermind/nethermind:latest
+    container_name: rxchain_node
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8545:8545" 
+      - "30303:30303"         
+    volumes:
+      - ./data:/nethermind/data
+      - ./chainspec.json:/nethermind/chainspec.json
+      - ./keystore:/nethermind/keystore
+      - ./password.txt:/nethermind/password.txt
+    command: >
+      --config=none
+      --Init.ChainSpecPath=/nethermind/chainspec.json
+      --Init.BaseDbPath=/nethermind/data
+      --Init.DiscoveryEnabled=false
+      --Mining.Enabled=true
+      --KeyStore.BlockAuthorAccount=0x3bb0D536BBcE0eda5a1cE99A10A8B18B8CDeDa6c
+      --KeyStore.KeyStoreDirectory=/nethermind/keystore
+      --KeyStore.UnlockAccounts=0x3bb0D536BBcE0eda5a1cE99A10A8B18B8CDeDa6c
+      --KeyStore.PasswordFiles=/nethermind/password.txt
+      --JsonRpc.Enabled=true
+      --JsonRpc.Host=0.0.0.0
+      --JsonRpc.Port=8545
+      --JsonRpc.EnabledModules=Eth,Net,Web3,Rpc,TxPool,Subscribe,Trace,Proof
+      --Merge.Enabled=false
+      --Aura.AllowAuRaPrivateChains=true
+      --Sync.SynchronizationEnabled=false
+      --Blocks.TargetBlockGasLimit=1000000000
+      --Blocks.MinGasPrice=100000000000
