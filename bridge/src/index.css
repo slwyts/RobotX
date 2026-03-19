@@ -1,0 +1,274 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 14.4px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #0a0a0f;
+  color: #fafafa;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: inherit;
+  font-family: inherit;
+}
+
+input::placeholder {
+  color: #404040;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6c6c6c;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+::selection {
+  background: rgba(6, 182, 212, 0.3);
+  color: #fff;
+}
+
+body.modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
+/* ========== Theme System ========== */
+[data-theme="dark"] {
+  --t-bg: #0a0a0f; --t-bg-card: #111118; --t-bg-panel: #16161e;
+  --t-bg-input: #1a1a22; --t-bg-hover: #141418;
+  --t-border: rgba(30,41,59,0.3); --t-border-solid: #222230;
+  --t-text: #fafafa; --t-text-muted: #94a3b8; --t-text-dim: #64748b;
+  --t-accent: #06b6d4; --t-nav-bg: rgba(10,10,15,0.8);
+  --t-card-alpha: rgba(255,255,255,0.04); --t-card-alpha-hover: rgba(255,255,255,0.07);
+}
+[data-theme="dim"] {
+  --t-bg: #1a1f2e; --t-bg-card: #1e2536; --t-bg-panel: #232b3e;
+  --t-bg-input: #283349; --t-bg-hover: #222940;
+  --t-border: rgba(42,51,80,0.5); --t-border-solid: #2a3350;
+  --t-text: #d0d4dc; --t-text-muted: #8890a0; --t-text-dim: #6a7490;
+  --t-accent: #06b6d4; --t-nav-bg: rgba(26,31,46,0.85);
+  --t-card-alpha: rgba(255,255,255,0.05); --t-card-alpha-hover: rgba(255,255,255,0.08);
+}
+[data-theme="light"] {
+  --t-bg: #f5f6fa; --t-bg-card: #ffffff; --t-bg-panel: #f0f1f5;
+  --t-bg-input: #e8ecf0; --t-bg-hover: #eef0f3;
+  --t-border: rgba(0,0,0,0.08); --t-border-solid: #dce0e6;
+  --t-text: #1a1a2e; --t-text-muted: #5a6370; --t-text-dim: #8c939e;
+  --t-accent: #0891b2; --t-nav-bg: rgba(255,255,255,0.92);
+  --t-card-alpha: rgba(0,0,0,0.04); --t-card-alpha-hover: rgba(0,0,0,0.07);
+}
+
+/* --- body --- */
+body { background: var(--t-bg, #0a0a0f) !important; color: var(--t-text, #fafafa) !important;
+  transition: background-color 0.4s, color 0.4s; }
+
+/* --- dim: 背景色调整 --- */
+[data-theme="dim"] [style*="background"][style*="0a0a0f"],
+[data-theme="dim"] [style*="background"][style*="0a0a10"],
+[data-theme="dim"] [style*="background"][style*="050508"] {
+  background: var(--t-bg) !important;
+}
+[data-theme="dim"] [style*="background"][style*="10,10,15"],
+[data-theme="dim"] [style*="background"][style*="10, 10, 15"] {
+  background: var(--t-nav-bg) !important;
+}
+
+/* --- light: 深色背景全部覆盖 --- */
+[data-theme="light"] [style*="background"][style*="0a0a"],
+[data-theme="light"] [style*="background"][style*="050508"],
+[data-theme="light"] [style*="background"][style*="0f0f1"],
+[data-theme="light"] [style*="background"][style*="11111"],
+[data-theme="light"] [style*="background"][style*="12121"],
+[data-theme="light"] [style*="background"][style*="15151"],
+[data-theme="light"] [style*="background"][style*="16161"],
+[data-theme="light"] [style*="background"][style*="1a1a2"],
+[data-theme="light"] [style*="background"][style*="10,10,15"],
+[data-theme="light"] [style*="background"][style*="10, 10, 15"] {
+  background: var(--t-bg-card) !important;
+}
+
+/* --- light: 深色border覆盖 --- */
+[data-theme="light"] [style*="border"][style*="1e293b"],
+[data-theme="light"] [style*="border"][style*="2a2a3a"],
+[data-theme="light"] [style*="border"][style*="334155"],
+[data-theme="light"] [style*="border"][style*="30,41,59"],
+[data-theme="light"] [style*="border"][style*="30, 41, 59"],
+[data-theme="light"] [style*="border"][style*="51,65,85"],
+[data-theme="light"] [style*="border"][style*="51, 65, 85"] {
+  border-color: var(--t-border-solid) !important;
+}
+[data-theme="dim"] [style*="border"][style*="1e293b"],
+[data-theme="dim"] [style*="border"][style*="30,41,59"],
+[data-theme="dim"] [style*="border"][style*="30, 41, 59"] {
+  border-color: var(--t-border-solid) !important;
+}
+
+/* --- light: 白色文字在浅背景上不可见,改为深色 --- */
+[data-theme="light"] [style*="color: rgb(255"],
+[data-theme="light"] [style*="color:#fff"],
+[data-theme="light"] [style*="color: #fff"] {
+  color: var(--t-text) !important;
+}
+
+/* --- light/dim: Tailwind utility覆盖 --- */
+[data-theme="light"] .text-white:not(.theme-btn):not([class*="bg-cyan"]):not([class*="bg-green"]):not([class*="bg-red"]):not([class*="bg-blue"]):not([class*="bg-gradient"]) {
+  color: var(--t-text) !important;
+}
+[data-theme="light"] .text-slate-100, [data-theme="light"] .text-slate-200 { color: var(--t-text) !important; }
+[data-theme="light"] .text-slate-300, [data-theme="light"] .text-slate-400 { color: var(--t-text-muted) !important; }
+[data-theme="light"] .text-slate-500, [data-theme="light"] .text-slate-600 { color: var(--t-text-dim) !important; }
+
+/* --- light: 半透白色背景 → 半透黑色 --- */
+[data-theme="light"] [class*="bg-white\/[0.0"],
+[data-theme="light"] [class*="bg-white\/\[0.0"] {
+  background-color: var(--t-card-alpha) !important;
+}
+[data-theme="light"] [class*="hover\:bg-white"]:hover {
+  background-color: var(--t-card-alpha-hover) !important;
+}
+
+/* --- light: border-slate --- */
+[data-theme="light"] [class*="border-slate-7"],
+[data-theme="light"] [class*="border-slate-8"],
+[data-theme="light"] [class*="border-slate-6"] {
+  border-color: var(--t-border-solid) !important;
+}
+[data-theme="dim"] [class*="border-slate-7"],
+[data-theme="dim"] [class*="border-slate-8"] {
+  border-color: var(--t-border-solid) !important;
+}
+
+/* --- light: 装饰渐变降低可见度 --- */
+[data-theme="light"] .pointer-events-none.fixed.inset-0,
+[data-theme="light"] .pointer-events-none[class*="fixed"][class*="inset"] {
+  opacity: 0.15 !important;
+}
+
+/* --- light: input placeholder --- */
+[data-theme="light"] input::placeholder { color: #999 !important; }
+[data-theme="dim"] input::placeholder { color: #6a7490 !important; }
+
+/* --- light: 滚动条 --- */
+[data-theme="light"] ::-webkit-scrollbar-thumb { background: #ccc !important; }
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #aaa !important; }
+[data-theme="dim"] ::-webkit-scrollbar-thumb { background: #3a4568 !important; }
+
+/* --- ThemeSwitcher样式 --- */
+.theme-switcher {
+  display: flex; border-radius: 8px; overflow: hidden;
+  background: var(--t-card-alpha); border: 1px solid var(--t-border);
+}
+.theme-btn {
+  padding: 4px 10px; font-size: 11px; display: flex; align-items: center; gap: 3px;
+  background: transparent; color: var(--t-text-muted, #94a3b8); border: none; cursor: pointer;
+  transition: all 0.15s; font-family: inherit; white-space: nowrap;
+}
+.theme-btn:hover { color: var(--t-text); background: var(--t-card-alpha-hover); }
+.theme-btn.active { background: var(--t-accent); color: #fff !important; }
+
+/* --- 平滑过渡(排除动画/SVG/input) --- */
+[data-theme] *, [data-theme] *::before, [data-theme] *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+[data-theme] [class*="animate-"], [data-theme] svg, [data-theme] input,
+[data-theme] [class*="transition"], [data-theme] canvas, [data-theme] img { transition: none !important; }
+
+/* === Light主题: Tailwind arbitrary bg-[#hex] 覆盖 (2026-03-05) === */
+[data-theme="light"] .bg-\[\#0a0a0f\] { background-color: var(--t-bg) !important; }
+[data-theme="light"] .bg-\[\#0f0f0f\] { background-color: var(--t-bg-panel) !important; }
+[data-theme="light"] .bg-\[\#0f0f0f\]\/80 { background-color: var(--t-bg-panel) !important; }
+[data-theme="light"] .bg-\[\#12121a\] { background-color: var(--t-bg-card) !important; }
+[data-theme="light"] .bg-\[\#15151e\] { background-color: var(--t-bg-card) !important; }
+[data-theme="light"] .bg-\[\#1a1a1a\] { background-color: var(--t-bg-card) !important; }
+[data-theme="light"] .bg-\[\#2e2e2e\] { background-color: var(--t-bg-input) !important; }
+[data-theme="light"] .bg-\[\#404040\] { background-color: var(--t-bg-hover) !important; }
+[data-theme="light"] .hover\:bg-\[\#2e2e2e\]:hover { background-color: var(--t-bg-input) !important; }
+[data-theme="light"] .hover\:bg-\[\#404040\]:hover { background-color: var(--t-bg-hover) !important; }
+[data-theme="light"] .hover\:bg-\[\#1a1a1a\]:hover { background-color: var(--t-bg-card) !important; }
+
+/* === Light主题: Tailwind arbitrary text-[#hex] 覆盖 === */
+[data-theme="light"] .text-\[\#fafafa\] { color: var(--t-text) !important; }
+[data-theme="light"] .text-\[\#b0b0b0\] { color: var(--t-text-muted) !important; }
+[data-theme="light"] .text-\[\#929292\] { color: var(--t-text-muted) !important; }
+[data-theme="light"] .text-\[\#6c6c6c\] { color: var(--t-text-dim) !important; }
+[data-theme="light"] .text-\[\#404040\] { color: var(--t-text-dim) !important; }
+
+/* === Light主题: Tailwind arbitrary border-[#hex] 覆盖 === */
+[data-theme="light"] .border-\[\#2e2e2e\] { border-color: var(--t-border-solid) !important; }
+[data-theme="light"] .border-\[\#404040\] { border-color: var(--t-border-solid) !important; }
+[data-theme="light"] .border-\[\#1e1e1e\] { border-color: var(--t-border-solid) !important; }
+[data-theme="light"] .border-\[\#6c6c6c\] { border-color: #b0b8c4 !important; }
+[data-theme="light"] .border-\[\#1a1a1a\] { border-color: var(--t-border-solid) !important; }
+[data-theme="light"] .hover\:border-\[\#404040\]:hover { border-color: #b0b8c4 !important; }
+[data-theme="light"] .hover\:border-\[\#6c6c6c\]:hover { border-color: #94a3b8 !important; }
+
+/* === Light主题: 导航栏和底部栏 rgba背景覆盖 === */
+[data-theme="light"] [style*="rgba(10,10,15"],
+[data-theme="light"] [style*="rgba(10, 10, 15"] {
+  background: var(--t-nav-bg) !important;
+}
+
+/* === Light主题: inline style background #2e2e2e 等 === */
+[data-theme="light"] [style*="background"][style*="#2e2e2e"],
+[data-theme="light"] [style*="background"][style*="#1a1a1a"],
+[data-theme="light"] [style*="background"][style*="#0f0f0f"] {
+  background: var(--t-bg-input) !important;
+}
+
+/* === Light主题: gradient from/to 深色覆盖 === */
+[data-theme="light"] .from-\[\#0f0f0f\] { --tw-gradient-from: var(--t-bg-panel) !important; }
+[data-theme="light"] .to-\[\#1a1a1a\] { --tw-gradient-to: var(--t-bg-card) !important; }
+[data-theme="light"] .border-\[\#2e2e2e\]\/50 { border-color: var(--t-border-solid) !important; }
