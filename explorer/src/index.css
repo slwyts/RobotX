@@ -1,0 +1,305 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  overflow-x: hidden;
+}
+
+/* ============================================
+   三套主题 CSS 变量 (Dark / Dim / Light)
+   ============================================ */
+
+/* Dark 主题 (默认) */
+[data-theme="dark"] {
+  --bg: #111111;
+  --bg-alt: #0d0d0f;
+  --bg-card: #111111;
+  --bg-panel: #16161a;
+  --bg-input: #1a1a1e;
+  --bg-hover: #141416;
+  --border: #222222;
+  --border-light: #1a1a1e;
+  --border-hover: #333333;
+  --text: #c0c2c5;
+  --text-muted: #888888;
+  --text-dim: #666666;
+  --text-faint: #555555;
+  --accent: #06b6d4;
+  --accent-hover: #22d3ee;
+  --link: #64a6bd;
+  --nav-bg: rgba(17,17,17,0.95);
+  --nav-blur: rgba(17,17,17,0.80);
+  --logo-text: #ffffff;
+  --logo-sub: #94a3b8;
+  --price-up: #34d399;
+  --price-down: #de4437;
+  --badge-bg: rgba(6,182,212,0.15);
+  --method-default-bg: #222222;
+  --method-default-text: #cbd5e1;
+  --method-default-border: #334155;
+  --footer-bg: #0d0d0f;
+  --scroll-thumb: #333333;
+  --scroll-hover: #444444;
+}
+
+/* Dim 主题 */
+[data-theme="dim"] {
+  --bg: #1a1f2e;
+  --bg-alt: #161b28;
+  --bg-card: #1e2536;
+  --bg-panel: #232b3e;
+  --bg-input: #283349;
+  --bg-hover: #222940;
+  --border: #2a3350;
+  --border-light: #232b3e;
+  --border-hover: #3a4568;
+  --text: #d0d4dc;
+  --text-muted: #8890a0;
+  --text-dim: #6a7490;
+  --text-faint: #505a70;
+  --accent: #06b6d4;
+  --accent-hover: #22d3ee;
+  --link: #7ba4c4;
+  --nav-bg: rgba(26,31,46,0.95);
+  --nav-blur: rgba(26,31,46,0.80);
+  --logo-text: #ffffff;
+  --logo-sub: #8890a0;
+  --price-up: #34d399;
+  --price-down: #f87171;
+  --badge-bg: rgba(6,182,212,0.15);
+  --method-default-bg: #283349;
+  --method-default-text: #d0d4dc;
+  --method-default-border: #3a4568;
+  --footer-bg: #161b28;
+  --scroll-thumb: #3a4568;
+  --scroll-hover: #4a5578;
+}
+
+/* Light 主题 */
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-alt: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-panel: #f0f2f5;
+  --bg-input: #e8ecf0;
+  --bg-hover: #f5f6f8;
+  --border: #e0e4e8;
+  --border-light: #eef0f3;
+  --border-hover: #c8cdd4;
+  --text: #1a1a2e;
+  --text-muted: #6c757d;
+  --text-dim: #999999;
+  --text-faint: #bbbbbb;
+  --accent: #0891b2;
+  --accent-hover: #06b6d4;
+  --link: #0e7490;
+  --nav-bg: rgba(255,255,255,0.95);
+  --nav-blur: rgba(255,255,255,0.80);
+  --logo-text: #1a1a2e;
+  --logo-sub: #6c757d;
+  --price-up: #059669;
+  --price-down: #dc2626;
+  --badge-bg: rgba(8,145,178,0.12);
+  --method-default-bg: #e8ecf0;
+  --method-default-text: #1a1a2e;
+  --method-default-border: #c8cdd4;
+  --footer-bg: #f8f9fa;
+  --scroll-thumb: #cccccc;
+  --scroll-hover: #aaaaaa;
+}
+
+/* ============================================
+   使用 CSS 变量的通用样式
+   ============================================ */
+
+/* 根据主题设置全局滚动条颜色 */
+[data-theme] .scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+[data-theme] .scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+[data-theme] .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: 3px;
+}
+[data-theme] .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--scroll-hover);
+}
+
+/* --- 主题化通用类 --- */
+.t-bg { background: var(--bg); }
+.t-bg-alt { background: var(--bg-alt); }
+.t-bg-card { background: var(--bg-card); }
+.t-bg-panel { background: var(--bg-panel); }
+.t-bg-input { background: var(--bg-input); }
+.t-bg-hover:hover { background: var(--bg-hover); }
+.t-border { border-color: var(--border); }
+.t-border-light { border-color: var(--border-light); }
+.t-border-hover:hover { border-color: var(--border-hover); }
+.t-text { color: var(--text); }
+.t-text-muted { color: var(--text-muted); }
+.t-text-dim { color: var(--text-dim); }
+.t-text-faint { color: var(--text-faint); }
+.t-accent { color: var(--accent); }
+.t-accent-hover:hover { color: var(--accent-hover); }
+.t-link { color: var(--link); }
+.t-logo-text { color: var(--logo-text); }
+.t-logo-sub { color: var(--logo-sub); }
+.t-price-up { color: var(--price-up); }
+.t-price-down { color: var(--price-down); }
+.t-footer-bg { background: var(--footer-bg); }
+
+/* 方法标签默认主题色 */
+.t-method-default {
+  background: var(--method-default-bg);
+  color: var(--method-default-text);
+  border-color: var(--method-default-border);
+}
+
+/* 导航栏背景 */
+.t-nav {
+  background: var(--nav-bg);
+}
+@supports (backdrop-filter: blur(1px)) {
+  .t-nav {
+    background: var(--nav-blur);
+    backdrop-filter: blur(16px);
+  }
+}
+
+/* 卡片 */
+.t-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+}
+.t-card:hover {
+  border-color: var(--border-hover);
+}
+
+/* 面板头 */
+.t-panel-head {
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+}
+.t-panel-foot {
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+}
+
+/* 分隔线 */
+.t-divider { border-color: var(--border-light); }
+.t-divider-strong { border-color: var(--border); }
+
+/* 输入框 */
+.t-input-box {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+}
+.t-input-box:hover { border-color: var(--border-hover); }
+
+/* 下拉菜单 */
+.t-dropdown {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-hover);
+}
+
+/* 标签/小badge */
+.t-badge {
+  background: var(--badge-bg);
+  color: var(--accent);
+}
+
+/* 行hover */
+.t-row:hover { background: var(--bg-hover); }
+
+/* 网络状态栏选择器 */
+.t-net-selector {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+}
+.t-net-selector:hover {
+  border-color: var(--border-hover);
+  background: var(--bg-input);
+}
+
+/* 搜索筛选标签 */
+.t-filter-tab {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.t-filter-tab:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+.t-filter-active {
+  background: var(--badge-bg);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+/* 主题切换器按钮 */
+.t-theme-btn {
+  color: var(--text-muted);
+}
+.t-theme-btn:hover {
+  color: var(--text);
+  background: var(--bg-input);
+}
+.t-theme-active {
+  background: var(--bg-input);
+  color: var(--text);
+}
+
+/* Cookie banner */
+.t-cookie {
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+/* 小标签 (Main/RX) */
+.t-tag-muted {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.t-tag-accent {
+  background: var(--badge-bg);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+/* 金额/奖励 pill */
+.t-pill {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+/* 加载条动画 */
+@keyframes loading-bar {
+  0% { width: 0%; }
+  50% { width: 70%; }
+  100% { width: 100%; }
+}
+.animate-loading-bar {
+  animation: loading-bar 0.8s ease-out forwards;
+}
+
+/* 全局过渡 */
+[data-theme] * {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+/* 排除动画元素 */
+[data-theme] .animate-pulse,
+[data-theme] .animate-spin,
+[data-theme] .animate-loading-bar,
+[data-theme] svg,
+[data-theme] svg * {
+  transition: none;
+}

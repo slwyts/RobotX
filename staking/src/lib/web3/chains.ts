@@ -14,13 +14,19 @@ export type SupportedChain = {
   };
 };
 
+const LOCAL_RPC_URL = process.env.NEXT_PUBLIC_LOCAL_RPC_URL ?? "http://127.0.0.1:8545";
+const LOCAL_CHAIN_ID = Number(process.env.NEXT_PUBLIC_LOCAL_CHAIN_ID ?? "31337");
+const ROBOTX_CHAIN_ID = Number(process.env.NEXT_PUBLIC_ROBOTX_CHAIN_ID ?? "2679");
+const ROBOTX_RPC_URL = process.env.NEXT_PUBLIC_ROBOTX_RPC_URL ?? "https://rpc.robotxhub.ai";
+const ROBOTX_EXPLORER_URL = process.env.NEXT_PUBLIC_ROBOTX_EXPLORER_URL ?? "https://explorer.robotxhub.ai";
+
 export const SUPPORTED_CHAINS: Record<SupportedChainKey, SupportedChain> = {
   "hardhat-local": {
     key: "hardhat-local",
-    chainId: 31337,
+    chainId: LOCAL_CHAIN_ID,
     name: "Hardhat Local",
     shortName: "Local",
-    rpcUrl: "http://127.0.0.1:8545",
+    rpcUrl: LOCAL_RPC_URL,
     explorerUrl: null,
     nativeCurrency: {
       name: "RobotX",
@@ -30,11 +36,11 @@ export const SUPPORTED_CHAINS: Record<SupportedChainKey, SupportedChain> = {
   },
   robotx: {
     key: "robotx",
-    chainId: 2679,
+    chainId: ROBOTX_CHAIN_ID,
     name: "RobotX Mainnet",
     shortName: "RobotX",
-    rpcUrl: "https://rpc.robotxhub.ai",
-    explorerUrl: "https://scan.robotxhub.ai",
+    rpcUrl: ROBOTX_RPC_URL,
+    explorerUrl: ROBOTX_EXPLORER_URL,
     nativeCurrency: {
       name: "RobotX",
       symbol: "RX",
