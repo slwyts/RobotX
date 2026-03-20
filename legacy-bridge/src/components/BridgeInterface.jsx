@@ -40,7 +40,7 @@ const translations = {
     // 底部移动端导航
     mobileNavBridge: '跨链',
     // 推广横幅
-    bannerTitle: '桥接 RX 到 Ethereum',
+    bannerTitle: '桥接 USDT 于 RX 和 BSC',
     bannerDesc: '快速 · 低费率 · 安全',
     // Token 选择器弹窗
     selectToken: '选择代币',
@@ -106,7 +106,7 @@ const translations = {
     // 底部移动端导航
     mobileNavBridge: 'Bridge',
     // 推广横幅
-    bannerTitle: 'Bridge RX to Ethereum',
+    bannerTitle: 'Bridge USDT Between RX and BSC',
     bannerDesc: 'Fast · Low fees · Secure',
     // Token 选择器弹窗
     selectToken: 'Select a Token',
@@ -151,12 +151,7 @@ const translations = {
 // 链配置
 // ═══════════════════════════════════════════
 const CHAINS = [
-  { id: 'robotx', name: 'ROBOTX', chainId: 0x524F58, color: '#06B6D4', icon: null, blockTime: '3s', consensus: 'DPoS', nativeCurrency: 'RX' },
-  { id: 'ethereum', name: 'Ethereum', chainId: 1, color: '#627EEA', icon: 'https://cdn.orbiter.finance/icon/chain/1.svg', blockTime: '12s', consensus: 'PoS', nativeCurrency: 'ETH' },
-  { id: 'arbitrum', name: 'Arbitrum', chainId: 42161, color: '#28A0F0', icon: 'https://cdn.orbiter.finance/icon/chain/42161.svg', blockTime: '0.26s', consensus: 'Nitro', nativeCurrency: 'ETH' },
-  { id: 'base', name: 'Base', chainId: 8453, color: '#0052FF', icon: 'https://cdn.orbiter.finance/icon/chain/8453.svg', blockTime: '2s', consensus: 'OP', nativeCurrency: 'ETH' },
-  { id: 'optimism', name: 'Optimism', chainId: 10, color: '#FF0420', icon: 'https://cdn.orbiter.finance/icon/chain/10.svg', blockTime: '2s', consensus: 'OP', nativeCurrency: 'ETH' },
-  { id: 'polygon', name: 'Polygon', chainId: 137, color: '#8247E5', icon: 'https://cdn.orbiter.finance/icon/chain/137.svg', blockTime: '2s', consensus: 'PoS', nativeCurrency: 'MATIC' },
+  { id: 'robotx', name: 'ROBOTX', chainId: 0xA77, color: '#06B6D4', icon: null, blockTime: '3s', consensus: 'DPoS', nativeCurrency: 'RX' },
   { id: 'bsc', name: 'BNB Chain', chainId: 56, color: '#F0B90B', icon: 'https://cdn.orbiter.finance/icon/chain/56.svg', blockTime: '3s', consensus: 'PoSA', nativeCurrency: 'BNB' },
 ];
 
@@ -164,13 +159,7 @@ const CHAINS = [
 // 代币配置
 // ═══════════════════════════════════════════
 const TOKENS = [
-  { symbol: 'RX', name: 'ROBOTX', color: '#06B6D4', decimals: 6, balance: 12580.00, price: 2.45, logo: null, contract: null },
-  { symbol: 'ETH', name: 'Ethereum', color: '#627EEA', decimals: 18, balance: 3.5821, price: 2650.32, logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png', contract: '0x4630917c0c9871398aaf7f5ba47738c0aa39b836' },
-  { symbol: 'USDT', name: 'Tether USD', color: '#26A17B', decimals: 6, balance: 5000.00, price: 1.00, logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png', contract: '0x366749238c873ec04258d178b357b7e00422c0a4' },
-  { symbol: 'USDC', name: 'USD Coin', color: '#2775CA', decimals: 6, balance: 3200.50, price: 1.00, logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png', contract: '0x7d7e19c484244741530cb27c993a54219e195cc6' },
-  { symbol: 'BNB', name: 'BNB', color: '#F0B90B', decimals: 18, balance: 8.2500, price: 635.20, logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png', contract: '0x22131cabac05cd131d0d48c4aaf0877aa5400d85' },
-  { symbol: 'DAI', name: 'Dai', color: '#F5AC37', decimals: 18, balance: 800.00, price: 1.00, logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png', contract: '0xdd96950b01aae6d78bbbf323bedd2e3422cff814' },
-  { symbol: 'POL', name: 'Polygon', color: '#8247E5', decimals: 18, balance: 0, price: 0.45, logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png', contract: '0x8Ee160E90E388Bb860d397346197289489982248' },
+  { symbol: 'USDT', name: 'Tether USD', color: '#26A17B', decimals: 18, balance: 5000.00, price: 1.00, logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png', contract: process.env.REACT_APP_RX_USDT || '0x366749238c873ec04258d178b357b7e00422c0a4' },
 ];
 
 
@@ -178,13 +167,8 @@ const TOKENS = [
 // 链→代币支持映射（按链过滤可选代币）
 // ═══════════════════════════════════════════
 const CHAIN_TOKEN_SUPPORT = {
-  robotx:   ['RX', 'ETH', 'USDT', 'USDC', 'BNB', 'DAI', 'POL'],
-  ethereum: ['ETH', 'USDT', 'USDC', 'DAI'],
-  arbitrum: ['ETH', 'USDT', 'USDC'],
-  base:     ['ETH', 'USDC'],
-  optimism: ['ETH', 'USDT', 'USDC'],
-  polygon:  ['POL', 'USDT', 'USDC', 'DAI'],
-  bsc:      ['ETH', 'USDT', 'USDC', 'BNB'],
+  robotx: ['USDT'],
+  bsc: ['USDT'],
 };
 
 const getTokensForChain = (chainId) => {
@@ -200,78 +184,36 @@ const getTokensForChain = (chainId) => {
 // ═══════════════════════════════════════════
 // 桥接配置
 // ═══════════════════════════════════════════
-const BRIDGE_VAULT = '0xed8D698d18575d9f732556516A8721ABC8A87171';
+const BRIDGE_VAULT = process.env.REACT_APP_RX_BRIDGE_CONTRACT || '0xed8D698d18575d9f732556516A8721ABC8A87171';
 // 各链桥合约地址
 const BRIDGE_CONTRACTS = {
-  56: '0x9fa1CDcd87df2C15bFDd1843A536eC98829ac1c7',    // BSC
-  1: '0x9fa1CDcd87df2C15bFDd1843A536eC98829ac1c7',     // Ethereum
-  42161: '0x4Cb8f948c16AECD6ce0250f0B97e9BD3e65906dE', // Arbitrum
-  8453: '0x9fa1CDcd87df2C15bFDd1843A536eC98829ac1c7',  // Base
-  10: '0x9fa1CDcd87df2C15bFDd1843A536eC98829ac1c7',    // Optimism
-  137: '0x9fa1CDcd87df2C15bFDd1843A536eC98829ac1c7',   // Polygon
+  56: process.env.REACT_APP_BSC_BRIDGE_CONTRACT || '0x9fa1CDcd87df2C15bFDd1843A536eC98829ac1c7',    // BSC
 };
 
 // 外部链上的代币合约地址
 const EXTERNAL_TOKEN_CONTRACTS = {
   56: { // BSC
-    USDT: '0x55d398326f99059fF775485246999027B3197955',
-    USDC: '0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d',
-    BNB:  'native',
-    ETH:  '0x2170Ed0880ac9A755fd29B2688956BD959F933F8',
-  },
-  1: { // Ethereum
-    USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-    USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-    DAI:  '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-    ETH:  'native',
-  },
-  42161: { // Arbitrum
-    ETH: 'native',
-    USDT: '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',
-    USDC: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',
-  },
-  8453: { // Base
-    ETH: 'native',
-    USDC: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
-  },
-  10: { // Optimism
-    ETH: 'native',
-    USDT: '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58',
-    USDC: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',
-  },
-  137: { // Polygon
-    POL: 'native',
-    USDT: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
-    USDC: '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',
-    DAI: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
+    USDT: process.env.REACT_APP_BSC_USDT || '0x55d398326f99059fF775485246999027B3197955',
   },
 };
 
-const BRIDGE_RPC = 'https://rpc.robotxhub.io';
+const BRIDGE_RPC = process.env.REACT_APP_RX_RPC || 'https://rpc.robotxhub.ai';
+const RELAYER_API_BASE = process.env.REACT_APP_RELAYER_API_BASE || 'https://bridge.robotxhub.ai';
 
 // 外部链公共RPC节点
 const CHAIN_RPCS = {
-  1: 'https://ethereum-rpc.publicnode.com',
-  42161: 'https://arb1.arbitrum.io/rpc',
-  8453: 'https://base-mainnet.public.blastapi.io',
-  10: 'https://mainnet.optimism.io',
-  137: 'https://polygon-bor-rpc.publicnode.com',
   56: 'https://bsc-rpc.publicnode.com',
 };
 
 // 外部链ERC-20代币精度映射
 const EXTERNAL_TOKEN_DECIMALS = {
-  42161: { USDT: 6, USDC: 6 },
-  8453: { USDC: 6 },
-  10: { USDT: 6, USDC: 6 },
-  137: { USDT: 6, USDC: 6 },
+  56: { USDT: 18 },
 };
 
 const COINGECKO_MAP = {
-  ethereum: 'ETH', binancecoin: 'BNB', tether: 'USDT',
-  'usd-coin': 'USDC', dai: 'DAI', 'polygon-ecosystem-token': 'POL',
+  tether: 'USDT',
 };
-const COINGECKO_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,binancecoin,tether,usd-coin,dai,polygon-ecosystem-token&vs_currencies=usd';
+const COINGECKO_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=usd';
 
 const externalRpcCall = async (chainId, method, params = []) => {
   const rpcUrl = CHAIN_RPCS[chainId];
@@ -330,8 +272,8 @@ const waitForTx = async (txHash, maxRetries = 10) => {
   for (let i = 0; i < maxRetries; i++) {
     await new Promise(r => setTimeout(r, 3000));
     try {
-      const tx = await rpcCall('robotx_getTransactionByHash', [txHash]);
-      if (tx) return tx;
+      const receipt = await rpcCall('eth_getTransactionReceipt', [txHash]);
+      if (receipt && receipt.blockHash) return receipt;
     } catch (e) {}
   }
   return null;
@@ -339,15 +281,14 @@ const waitForTx = async (txHash, maxRetries = 10) => {
 
 // chainId → Relayer链key映射
 const CHAIN_ID_TO_KEY = {
-  56: 'bsc', 1: 'ethereum', 42161: 'arbitrum',
-  8453: 'base', 10: 'optimism', 137: 'polygon',
+  56: 'bsc',
 };
 
 // 调用Relayer反向跨链API
 const callRelayerReverse = async (txHash, destChainId, destAddress, symbol, amount) => {
   const destChain = CHAIN_ID_TO_KEY[destChainId];
   if (!destChain) throw new Error('不支持的目标链: ' + destChainId);
-  const resp = await fetch('https://bridge.robotxhub.io/api/reverse-bridge', {
+  const resp = await fetch(`${RELAYER_API_BASE}/api/reverse-bridge`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -428,7 +369,7 @@ const ChainIcon = ({ chain, size = 20 }) => {
     return <img src={chain.icon} alt={chain.name} width={size} height={size}
       style={{ borderRadius: 4, objectFit: 'cover' }} onError={() => setImgErr(true)} />;
   }
-  if (chain?.id === 'robotx') return <img src="https://robotxhub.io/assets/images/logo.png" alt="RX" width={size} height={size} style={{borderRadius:'50%', objectFit:'contain'}}/>;
+  if (chain?.id === 'robotx') return <img src="/logo.png" alt="RX" width={size} height={size} style={{borderRadius:'50%', objectFit:'contain'}}/>;
   if (!chain) return <div style={{ width: size, height: size, borderRadius: 4, background: '#2e2e2e' }} />;
   return (
     <div style={{ width: size, height: size, borderRadius: 4, background: `${chain.color}25`,
@@ -456,7 +397,7 @@ const FlipArrowIcon = () => (
 // ═══════════════════════════════════════════
 const RobotXNavLogo = () => (
   <div className="flex items-center gap-1 cursor-pointer group">
-    <img src="https://robotxhub.io/assets/images/logo.png" alt="RobotX" width="80" height="80" className="-mr-1 rounded-full" style={{objectFit:"contain"}}/>
+    <img src="/logo.png" alt="RobotX" width="80" height="80" className="-mr-1 rounded-full" style={{objectFit:"contain"}}/>
     <span className="text-lg font-black tracking-wider" style={{fontFamily:"'Orbitron', sans-serif"}}>
         <span className="text-cyan-400">ROBOT</span>
         <span className="text-white">X</span>
@@ -515,12 +456,7 @@ const NavTab = ({ tab, activeNav, onSelect }) => {
 // 导航栏链选择器 (对齐DEX ChainSelector)
 // ═══════════════════════════════════════════
 const NAV_CHAINS = [
-  { name: 'ROBOTX', color: '#06B6D4', id: 'robotx', chainId: 0x524F58, blockTime: '3s', consensus: 'DPoS' },
-  { name: 'Ethereum', color: '#627EEA', id: 'eth', chainId: 1, blockTime: '12s', consensus: 'PoS' },
-  { name: 'Arbitrum', color: '#28A0F0', id: 'arb', chainId: 42161, blockTime: '0.26s', consensus: 'Nitro' },
-  { name: 'Base', color: '#0052FF', id: 'base', chainId: 8453, blockTime: '2s', consensus: 'OP' },
-  { name: 'Optimism', color: '#FF0420', id: 'op', chainId: 10, blockTime: '2s', consensus: 'OP' },
-  { name: 'Polygon', color: '#8247E5', id: 'poly', chainId: 137, blockTime: '2s', consensus: 'PoS' },
+  { name: 'ROBOTX', color: '#06B6D4', id: 'robotx', chainId: 0xA77, blockTime: '3s', consensus: 'DPoS' },
   { name: 'BNB Chain', color: '#F0B90B', id: 'bsc', chainId: 56, blockTime: '3s', consensus: 'PoSA' },
 ];
 
@@ -577,7 +513,7 @@ const ChainSelectorModal = ({ onSelect, onClose, currentChain, excludeChainId, t
   const inputRef = useRef(null);
   useEffect(() => { inputRef.current?.focus(); }, []);
 
-  const popularIds = ['robotx', 'arbitrum', 'ethereum', 'optimism', 'base', 'bsc'];
+  const popularIds = ['robotx', 'bsc'];
   const allChains = CHAINS.filter(c => c.chainId !== excludeChainId);
   const popularChains = allChains.filter(c => popularIds.includes(c.id));
   const searchResult = allChains.filter(c =>
@@ -916,6 +852,7 @@ const WalletModal = ({ onConnect, onClose, t }) => {
 const SuccessModal = ({ fromChain, toChain, fromToken, toToken, amount, txHash: initialTxHash, sourceTxHash, onClose, t }) => {
   const [copied, setCopied] = useState(false);
   const [txHash, setTxHash] = useState(initialTxHash);
+  const bridgeFeeText = fromChain?.id === 'robotx' ? '4%' : '1%';
   // 正向跨链时: txHash===sourceTxHash 说明前端没拿到ROBOTX链真实hash, 需要轮询Relayer
   useEffect(() => {
     if (!sourceTxHash || !initialTxHash || initialTxHash !== sourceTxHash) return;
@@ -923,7 +860,7 @@ const SuccessModal = ({ fromChain, toChain, fromToken, toToken, amount, txHash: 
     let alive = true;
     const poll = async () => {
       try {
-        const res = await fetch(`/api/release-status?sourceTxHash=${sourceTxHash}`);
+        const res = await fetch(`${RELAYER_API_BASE}/api/release-status?sourceTxHash=${sourceTxHash}`);
         const data = await res.json();
         if (alive && data.status === 'released' && data.robotxTxHash) {
           let h = data.robotxTxHash;
@@ -970,11 +907,11 @@ const SuccessModal = ({ fromChain, toChain, fromToken, toToken, amount, txHash: 
           </div>
           <div className="flex justify-between text-xs">
             <span className="text-[#6c6c6c]">{t.bridgeFee}</span>
-            <span className="text-[#b0b0b0]">0%</span>
+            <span className="text-[#b0b0b0]">{bridgeFeeText}</span>
           </div>
           <div className="flex justify-between text-xs">
             <span className="text-[#6c6c6c]">{t.chainId}</span>
-            <span className="text-[#b0b0b0] font-mono">0x524F58</span>
+            <span className="text-[#b0b0b0] font-mono">0xA77</span>
           </div>
         </div>
         <div className="flex flex-col gap-2">
@@ -989,7 +926,7 @@ const SuccessModal = ({ fromChain, toChain, fromToken, toToken, amount, txHash: 
               </button>
             )}
             {sourceTxHash && sourceTxHash !== txHash && (() => {
-              const exps = {56:'https://bscscan.com/tx/',1:'https://etherscan.io/tx/',42161:'https://arbiscan.io/tx/',8453:'https://basescan.org/tx/',10:'https://optimistic.etherscan.io/tx/',137:'https://polygonscan.com/tx/'};
+              const exps = {56:'https://bscscan.com/tx/'};
               const cid = fromChain?.id !== 'robotx' ? fromChain?.chainId : toChain?.chainId;
               const u = exps[cid];
               return u ? <button onClick={() => window.open(u + sourceTxHash, '_blank')} className="flex-1 py-2.5 rounded-2xl bg-purple-500/15 text-purple-400 text-xs font-medium hover:bg-purple-500/25 transition-colors flex items-center justify-center gap-1 cursor-pointer">
@@ -1087,7 +1024,6 @@ const BridgeInterface = () => {
   }, []);
   const getTokenPrice = useCallback((token) => {
     if (!token) return 0;
-    if (token.symbol === 'RX') return token.price;
     return (livePrices && livePrices[token.symbol]) || token.price;
   }, [livePrices]);
   const [connectedWallet, setConnectedWallet] = useState('');
@@ -1117,18 +1053,14 @@ const BridgeInterface = () => {
     let alive = true;
     const poll = async () => {
       try {
-        const res = await fetch('https://rpc.robotxhub.io', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ jsonrpc: '2.0', method: 'robotx_getChainInfo', params: [], id: 1 }),
-        });
-        const json = await res.json();
-        if (alive && json.result) {
-          const r = json.result;
+        const blockHex = await rpcCall('eth_blockNumber', []);
+        if (alive && blockHex) {
+          const blockHeight = parseInt(blockHex, 16) || 0;
           setChainData({
-            blockHeight: r.blockHeight || 0,
-            txCount: r.txCount || 0,
-            srCount: r.srCount || 0,
-            epochBlock: r.epochBlock || 0,
+            blockHeight,
+            txCount: 0,
+            srCount: 0,
+            epochBlock: 0,
           });
         }
       } catch (_) {}
@@ -1144,10 +1076,10 @@ const BridgeInterface = () => {
     let alive = true;
     const fetchBalance = async () => {
       try {
-        const balance = await rpcCall('robotx_getBalance', [rawHexAddress || walletAddress]);
+        const balance = await rpcCall('eth_getBalance', [rawHexAddress || walletAddress, 'latest']);
         if (alive) {
-          const bal = typeof balance === 'number' ? balance : parseInt(balance) || 0;
-          setRxBalance(bal / 1e6);
+          const bal = balance ? Number(BigInt(balance)) : 0;
+          setRxBalance(bal / 1e18);
         }
       } catch (e) {}
     };
@@ -1162,8 +1094,8 @@ const BridgeInterface = () => {
     let alive = true;
     const fetchAccountInfo = async () => {
       try {
-        const info = await rpcCall('robotx_getAccountInfo', [rawHexAddress || walletAddress]);
-        if (alive && info) setAccountInfo(info);
+        const nonceHex = await rpcCall('eth_getTransactionCount', [rawHexAddress || walletAddress, 'latest']);
+        if (alive && nonceHex) setAccountInfo({ nonce: parseInt(nonceHex, 16) || 0 });
       } catch (e) {}
     };
     fetchAccountInfo();
@@ -1275,10 +1207,10 @@ const BridgeInterface = () => {
     }
   }, [toChain]);
 
-  // 计算接收金额(正向1%手续费, 反向5%手续费)
+  // 计算接收金额(正向1%手续费, 反向4%手续费)
   useEffect(() => {
     if (amount && parseFloat(amount) > 0 && fromToken && toToken && toChain) {
-      const feeRate = fromChain?.id === 'robotx' ? 0.05 : 0.01;
+      const feeRate = fromChain?.id === 'robotx' ? 0.04 : 0.01;
       const fee = parseFloat(amount) * feeRate;
       const afterFee = parseFloat(amount) - fee;
       const receive = afterFee * (getTokenPrice(fromToken) / getTokenPrice(toToken));
@@ -1441,23 +1373,9 @@ const BridgeInterface = () => {
           }
         }
 
-        // Relayer会监听BSC事件自动释放, 这里也可以手动触发作为备用
-        let robotxTxHash = sourceTxHash;
-        try {
-          const result = await rpcCall('robotx_bridgeRelease', [{
-            token: tokenSymbol,
-            amount: rawAmount.toString(),
-            destAddress: destAddr,
-            sourceTxHash: sourceTxHash,
-          }]);
-          robotxTxHash = result?.txHash || result || sourceTxHash;
-        } catch (rpcErr) {
-          console.log('bridgeRelease RPC (relayer will handle):', rpcErr.message);
-        }
-
         setSuccessData({
           fromChain, toChain, fromToken, toToken, amount,
-          txHash: robotxTxHash,
+          txHash: sourceTxHash,
           sourceTxHash,
         });
         setAmount(''); setReceiveAmount('');
@@ -1473,7 +1391,7 @@ const BridgeInterface = () => {
         try {
           await window.ethereum.request({
             method: 'wallet_switchEthereumChain',
-            params: [{ chainId: '0x524F58' }]
+            params: [{ chainId: '0xA77' }]
           });
         } catch (sw) {}
 
@@ -1552,23 +1470,8 @@ const BridgeInterface = () => {
         alert(t.btnBridge + ' failed: ' + e.message);
       }
     } else if (isRealWallet && isFromRobotx && isToRobotx) {
-      // ROBOTX → ROBOTX (自转)
-      try {
-        const nonce = accountInfo?.nonce || accountInfo?.Nonce || 0;
-        const txHash = await rpcCall('robotx_sendRawTransaction', [{
-          from: rawHexAddress || walletAddress,
-          to: rawHexAddress || walletAddress,
-          value: Math.round(parseFloat(amount) * 1e6),
-          fee: 100000, nonce, type: 0,
-        }]);
-        await waitForTx(txHash, 5);
-        setSuccessData({ fromChain, toChain, fromToken, toToken, amount, txHash });
-        setAmount(''); setReceiveAmount('');
-        setIsBridging(false);
-      } catch (e) {
-        setIsBridging(false);
-        alert(t.btnBridge + ' failed: ' + e.message);
-      }
+      setIsBridging(false);
+      alert('Same-chain transfer is not supported in this bridge UI.');
     } else {
       // 模拟模式
       setTimeout(() => {
@@ -1602,11 +1505,11 @@ const BridgeInterface = () => {
           await provider.request({
             method: 'wallet_addEthereumChain',
             params: [{
-              chainId: '0x524F58',
+              chainId: '0xA77',
               chainName: 'ROBOTX Mainnet',
-              nativeCurrency: { name: 'RX', symbol: 'RX', decimals: 6 },
-              rpcUrls: ['https://rpc.robotxhub.io'],
-              blockExplorerUrls: ['https://explorer.robotxhub.io'],
+              nativeCurrency: { name: 'RX', symbol: 'RX', decimals: 18 },
+              rpcUrls: ['https://rpc.robotxhub.ai'],
+              blockExplorerUrls: ['https://explorer.robotxhub.ai'],
             }]
           });
         } catch (addErr) {}
@@ -1614,8 +1517,7 @@ const BridgeInterface = () => {
         if (accounts && accounts.length > 0) {
           const hex = accounts[0];
           setRawHexAddress(hex);
-          const rxAddr = await hexToRXAddress(hex);
-          setWalletAddress(rxAddr);
+          setWalletAddress(hex);
           setConnectedWallet(name);
           setIsConnected(true);
           setIsRealWallet(true);
@@ -1624,7 +1526,7 @@ const BridgeInterface = () => {
       } catch (e) { console.error(name + '连接失败:', e); }
     } else {
       // WalletConnect 等暂用模拟
-      setWalletAddress('RXTJnkP8m2Kj5vRq9YwBd4fG7hXi3NpQ6sMr');
+      setWalletAddress('0x1111111111111111111111111111111111111111');
       setConnectedWallet(name);
       setIsConnected(true);
       setIsRealWallet(false);
@@ -1711,7 +1613,7 @@ const BridgeInterface = () => {
                 <div className="w-5 h-5 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
                   <div className="w-3 h-3 rounded-full bg-[#0a0a0f]"/>
                 </div>
-                <span className="hidden md:inline text-white text-sm font-medium font-mono">{walletAddress ? (walletAddress.length > 12 ? walletAddress.slice(0, 8) + '...' + walletAddress.slice(-4) : walletAddress) : 'RXa7F2...8e3D'}</span>
+                <span className="hidden md:inline text-white text-sm font-medium font-mono">{walletAddress ? (walletAddress.length > 12 ? walletAddress.slice(0, 8) + '...' + walletAddress.slice(-4) : walletAddress) : '0x1234...5678'}</span>
                 <ChevronDown size={14} className={`hidden md:inline text-slate-400 transition-transform ${showWalletDropdown ? 'rotate-180' : ''}`}/>
               </button>
               {showWalletDropdown && (
@@ -1719,14 +1621,13 @@ const BridgeInterface = () => {
                   <div className="fixed inset-0 z-[90]" onClick={() => setShowWalletDropdown(false)}/>
                   <div className="absolute right-0 top-full mt-2 w-[280px] max-w-[calc(100vw-32px)] rounded-xl border shadow-2xl z-[91] overflow-hidden" style={{background:'var(--card-bg, #16161e)', borderColor:'var(--border, #2a2a3a)'}}>
                     <div className="px-4 py-3" style={{borderBottom:'1px solid var(--border, #2a2a3a)'}}>
-                      <div className="text-[10px] uppercase tracking-wider mb-1" style={{color:'var(--text-muted, #888)'}}>RX Address</div>
-                      <div className="text-xs font-mono break-all" style={{color:'var(--text, #fff)'}}>{walletAddress || 'RXa7F2...8e3D'}</div>
-                      {rawHexAddress && <div className="text-[10px] font-mono mt-1 break-all" style={{color:'var(--text-muted, #666)'}}>{rawHexAddress}</div>}
+                      <div className="text-[10px] uppercase tracking-wider mb-1" style={{color:'var(--text-muted, #888)'}}>Wallet Address</div>
+                      <div className="text-xs font-mono break-all" style={{color:'var(--text, #fff)'}}>{walletAddress || '0x1234567890abcdef1234567890abcdef12345678'}</div>
                     </div>
                     <button onClick={() => { const addr = walletAddress || rawHexAddress; navigator.clipboard.writeText(addr).then(() => { setCopiedAddress(true); setTimeout(() => setCopiedAddress(false), 2000); }); }}
                       className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-white/5 transition-colors text-left" style={{color:'var(--text, #fff)'}}>
                       {copiedAddress ? <Check size={16} className="text-green-400"/> : <Copy size={16} className="text-cyan-400"/>}
-                      <span className="text-sm">{copiedAddress ? (lang === 'zh' ? '已复制' : 'Copied!') : (lang === 'zh' ? '复制RX地址' : 'Copy RX Address')}</span>
+                      <span className="text-sm">{copiedAddress ? (lang === 'zh' ? '已复制' : 'Copied!') : (lang === 'zh' ? '复制地址' : 'Copy Address')}</span>
                     </button>
                     <button onClick={() => { setIsConnected(false); setConnectedWallet(''); setIsRealWallet(false); setWalletAddress(''); setRawHexAddress(''); setRxBalance(0); setTokenBalances({}); setAccountInfo(null); setExternalNativeBalance(0); setExternalTokenBalances({}); setShowWalletDropdown(false); }}
                       className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-red-500/10 transition-colors text-left" style={{borderTop:'1px solid var(--border, #2a2a3a)'}}>
@@ -2011,7 +1912,7 @@ const BridgeInterface = () => {
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-[#6c6c6c] flex items-center gap-1.5"><Fuel size={11} />{t.infoBridgeFee}</span>
-                  <span className="text-[#b0b0b0]">{bridgeFee.toFixed(6)} {fromToken.symbol} <span className="text-[#6c6c6c]">({fromChain?.id === 'robotx' ? '5' : '1'}%)</span></span>
+                  <span className="text-[#b0b0b0]">{bridgeFee.toFixed(6)} {fromToken.symbol} <span className="text-[#6c6c6c]">({fromChain?.id === 'robotx' ? '4' : '1'}%)</span></span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-[#6c6c6c] flex items-center gap-1.5"><Shield size={11} />{t.infoSlippage}</span>
