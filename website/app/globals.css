@@ -1,0 +1,374 @@
+@import "tailwindcss";
+
+/* ===== 强制自定义动画类不被 Tailwind v4 purge ===== */
+@layer utilities {
+  .animate-float-1        { animation: floatBlob1 12s ease-in-out infinite; }
+  .animate-float-2        { animation: floatBlob2 15s ease-in-out infinite; }
+  .animate-float-3        { animation: floatBlob3 18s ease-in-out infinite; }
+  .animate-card-float-1   { animation: cardFloat1 4s ease-in-out infinite; }
+  .animate-card-float-2   { animation: cardFloat2 5s ease-in-out infinite; }
+  .animate-card-float-3   { animation: cardFloat3 3.5s ease-in-out infinite; }
+  .animate-hex-pulse      { animation: hexPulse 4s ease-in-out infinite; }
+  .animate-pulse-ring     { animation: pulseRing 3s ease-out infinite; }
+  .animate-marquee        { animation: marqueeScroll 20s linear infinite; }
+  .animate-number-glow    { animation: numberGlow 3s ease-in-out infinite; }
+  .animate-spin-slow      { animation: spin-slow 6s linear infinite; }
+  .animate-spin-reverse   { animation: spin-reverse 4s linear infinite; }
+  .animate-pulse-glow     { animation: pulse-glow 3s ease-in-out infinite; }
+  .animate-breathe        { animation: breatheGlow 6s ease-in-out infinite; }
+  .animate-cardIn         { animation: cardIn 0.5s ease forwards; opacity: 0; }
+}
+
+/* ===== @keyframes（必须在 @layer 外，否则不生效） ===== */
+@keyframes floatBlob1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25%       { transform: translate(30px, -40px) scale(1.1); }
+  50%       { transform: translate(-20px, -70px) scale(0.95); }
+  75%       { transform: translate(40px, -30px) scale(1.05); }
+}
+@keyframes floatBlob2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25%       { transform: translate(-40px, 30px) scale(1.08); }
+  50%       { transform: translate(30px, 50px) scale(0.92); }
+  75%       { transform: translate(-20px, -20px) scale(1.12); }
+}
+@keyframes floatBlob3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%       { transform: translate(50px, 20px) scale(1.15); }
+  66%       { transform: translate(-30px, -40px) scale(0.9); }
+}
+@keyframes cardFloat1 {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
+@keyframes cardFloat2 {
+  0%, 100% { transform: translateY(0); }
+  33%       { transform: translateY(-8px) translateX(5px); }
+  66%       { transform: translateY(-15px) translateX(-3px); }
+}
+@keyframes cardFloat3 {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px) rotate(1.5deg); }
+}
+@keyframes hexPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.06); }
+}
+@keyframes pulseRing {
+  0%   { transform: scale(0.8); opacity: 0.6; }
+  50%  { transform: scale(1.2); opacity: 0; }
+  100% { transform: scale(0.8); opacity: 0; }
+}
+@keyframes marqueeScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes numberGlow {
+  0%, 100% { text-shadow: 0 0 20px rgba(16, 225, 255, 0.3); }
+  50%       { text-shadow: 0 0 40px rgba(16, 225, 255, 0.6), 0 0 80px rgba(16, 225, 255, 0.2); }
+}
+@keyframes spin-slow    { to { transform: rotate(360deg); } }
+@keyframes spin-reverse { to { transform: rotate(-360deg); } }
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(16, 225, 255, 0.2); }
+  50%       { box-shadow: 0 0 40px rgba(16, 225, 255, 0.4); }
+}
+@keyframes breatheGlow {
+  0%, 100% { opacity: 0.15; }
+  50%       { opacity: 0.25; }
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroFadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroPathReveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0% 0 0); }
+}
+@keyframes borderGradient {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50%       { opacity: 1; transform: scale(1.5); }
+}
+@keyframes textShine {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ===== 全局基础样式 ===== */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #fff;
+    color: #05163D;
+    overflow-x: hidden;
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  img {
+    image-rendering: auto;
+  }
+
+  ::selection {
+    background: rgba(16, 225, 255, 0.3);
+    color: #05163D;
+  }
+
+  ::-webkit-scrollbar         { width: 4px; }
+  ::-webkit-scrollbar-track   { background: transparent; }
+  ::-webkit-scrollbar-thumb   { background: #cbd5e1; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+}
+
+/* ===== 组件样式 ===== */
+@layer components {
+  /* ---- 垂直线背景纹理 ---- */
+  .bg-lines::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      to right,
+      rgba(5, 22, 61, 0.05) 0px,
+      rgba(5, 22, 61, 0.05) 1px,
+      transparent 1px,
+      transparent
+    );
+    background-size: 16.6667% 100%;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  /* ---- 滚动条隐藏 ---- */
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* ---- 按钮 ---- */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    min-height: 44px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    background: black;
+    color: white;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .btn-primary:hover {
+    background: #05163D;
+    color: #10E1FF;
+    box-shadow: 0 0 14px rgba(16, 225, 255, 0.5);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    min-height: 44px;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    background: transparent;
+    color: black;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+  .btn-secondary:hover {
+    background: #10E1FF;
+    color: #05163D;
+    border-color: transparent;
+    box-shadow: 0 0 14px rgba(16, 225, 255, 0.5);
+  }
+
+  .btn-hero-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 32px;
+    min-height: 48px;
+    border-radius: 40px;
+    font-size: 15px;
+    font-weight: 700;
+    transition: all 0.2s;
+    background: white;
+    color: #05163D;
+    border: 1px solid transparent;
+    cursor: pointer;
+  }
+  .btn-hero-primary:hover {
+    background: #10E1FF;
+    color: #05163D;
+    box-shadow: 0 0 20px rgba(16, 225, 255, 0.5);
+  }
+
+  .btn-hero-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 32px;
+    min-height: 48px;
+    border-radius: 40px;
+    font-size: 15px;
+    font-weight: 700;
+    transition: all 0.2s;
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+  }
+  .btn-hero-secondary:hover {
+    background: #10E1FF;
+    color: #05163D;
+    border-color: transparent;
+    box-shadow: 0 0 20px rgba(16, 225, 255, 0.5);
+  }
+
+  /* ---- 辉光/阴影 ---- */
+  .shadow-button-glow { box-shadow: 0 0 14px rgba(16, 225, 255, 0.5); }
+  .shadow-card        { box-shadow: 0 4px 30px rgba(5, 22, 61, 0.08); }
+  .shadow-card-hover  { box-shadow: 0 8px 40px rgba(5, 22, 61, 0.12); }
+  .text-shadow-cyan   { text-shadow: 0 0 20px rgba(16, 225, 255, 0.4); }
+  .text-shadow-hero   { text-shadow: 0 0 60px rgba(6, 182, 212, 0.4), 0 0 120px rgba(6, 182, 212, 0.15); }
+
+  /* ---- Hero 动画类 ---- */
+  .hero-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroFadeIn 0.8s ease forwards;
+  }
+  .hero-path {
+    animation: heroPathReveal 1.5s ease-out forwards;
+  }
+
+  /* ---- Hero 纹理 ---- */
+  .hero-grid {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-scanlines {
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255,255,255,0.015) 2px,
+      rgba(255,255,255,0.015) 4px
+    );
+  }
+
+  /* ---- 渐变边框 ---- */
+  .gradient-border {
+    background: linear-gradient(135deg, #06b6d4, #a855f7, #ec4899, #06b6d4);
+    background-size: 300% 300%;
+    animation: borderGradient 4s ease infinite;
+  }
+
+  /* ---- 卡片渐变背景 ---- */
+  .card-gradient-cyan   { background: linear-gradient(135deg, #ecfeff 0%, #f0f9ff 50%, #f8fafc 100%); }
+  .card-gradient-purple { background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 50%, #f8fafc 100%); }
+  .card-gradient-pink   { background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f8fafc 100%); }
+  .card-gradient-green  { background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 50%, #f8fafc 100%); }
+  .card-gradient-amber  { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 50%, #f8fafc 100%); }
+  .card-gradient-blue   { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #f8fafc 100%); }
+
+  /* ---- 点阵纹理 ---- */
+  .dot-pattern {
+    background-image: radial-gradient(rgba(5, 22, 61, 0.06) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* ---- 六边形 ---- */
+  .hexagon {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+
+  /* ---- 闪光扫过 ---- */
+  .shimmer-effect {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-effect::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  /* ---- 终端扫描线 ---- */
+  .terminal-scanlines {
+    background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.1) 50%),
+                linear-gradient(90deg, rgba(255,0,0,0.03), rgba(0,255,0,0.01), rgba(0,0,255,0.03));
+    background-size: 100% 2px, 3px 100%;
+  }
+
+  /* ---- 渐变文字 ---- */
+  .text-gradient-cyan {
+    background: linear-gradient(135deg, #06b6d4, #22d3ee, #67e8f9);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .text-gradient-multi {
+    background: linear-gradient(135deg, #ec4899, #a855f7, #06b6d4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ---- 渐变文字扫光 ---- */
+  .text-shine {
+    background: linear-gradient(90deg, #06b6d4, #a855f7, #ec4899, #06b6d4, #a855f7);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: textShine 6s linear infinite;
+  }
+
+  /* ---- marquee hover 暂停 ---- */
+  .animate-marquee:hover { animation-play-state: paused; }
+}
