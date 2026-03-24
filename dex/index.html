@@ -155,7 +155,8 @@
             'function name() view returns (string)',
             'function approve(address, uint256) returns (bool)',
             'function allowance(address, address) view returns (uint256)',
-            'function totalSupply() view returns (uint256)'
+            'function totalSupply() view returns (uint256)',
+            'function transfer(address, uint256) returns (bool)'
         ];
 
         const WRX_ABI = ['function deposit() payable', 'function withdraw(uint wad)'];
@@ -188,7 +189,8 @@
             'function balanceOf(address) view returns (uint256)',
             'function approve(address, uint256) returns (bool)',
             'function nonces(address) view returns (uint256)',
-            'function name() view returns (string)'
+            'function name() view returns (string)',
+            'function mint(address to) external returns (uint liquidity)'
         ];
 
         // ==========================================
@@ -203,6 +205,8 @@
         const IconSun = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
         const IconMoon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>;
         const IconWalletAdd = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/><path d="M10 10v4"/><path d="M8 12h4"/></svg>;
+        const IconLock = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>;
+        const IconUnlock = () => <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>;
 
         const TokenIcon = ({ token, className = "w-6 h-6 rounded-full" }) => {
             if (!token) return null;
@@ -245,7 +249,8 @@
                 myPositions: '我的仓位', marketPools: '市场池子', noPositions: '未找到流动性仓位',
                 pooled: '已存入', remove: '移除', add: '添加', loadingPools: '加载中...', 
                 youReceive: '预估获得', minReceive: '最低获得', priceImpact: '价格影响', route: '智能路由',
-                wrap: '打包 (Wrap)', unwrap: '解包 (Unwrap)', permitSign: '免Gas签名授权中...', addToWallet: '添加至钱包'
+                wrap: '打包 (Wrap)', unwrap: '解包 (Unwrap)', permitSign: '免Gas签名授权中...', addToWallet: '添加至钱包',
+                ratioLocked: '同步', ratioUnlocked: '独立', emptyPool: '新交易对', impliedPrice: '汇率'
             },
             en: {
                 swap: 'Swap', pool: 'Pool', connectWallet: 'Connect Wallet', wrongNetwork: 'Switch Network',
@@ -258,7 +263,8 @@
                 myPositions: 'My Positions', marketPools: 'Market Pools', noPositions: 'No liquidity positions found.',
                 pooled: 'Pooled', remove: 'Remove', add: 'Add', loadingPools: 'Loading...', 
                 youReceive: 'Est. Receive', minReceive: 'Minimum Received', priceImpact: 'Price Impact', route: 'Smart Route',
-                wrap: 'Wrap', unwrap: 'Unwrap', permitSign: 'Sign Permit (Gasless)...', addToWallet: 'Add to Wallet'
+                wrap: 'Wrap', unwrap: 'Unwrap', permitSign: 'Sign Permit (Gasless)...', addToWallet: 'Add to Wallet',
+                ratioLocked: 'Sync', ratioUnlocked: 'Independent', emptyPool: 'New Pair', impliedPrice: 'Rate'
             }
         };
 
@@ -479,6 +485,7 @@
             const [quoteDetails, setQuoteDetails] = useState(null);
             const [showDetails, setShowDetails] = useState(false);
             const [inputDirection, setInputDirection] = useState('in');
+            const [poolTooShallow, setPoolTooShallow] = useState(false);
 
             const isWrap = tokenIn.isNative && tokenOut.address === CONTRACTS.WRX;
             const isUnwrap = tokenIn.address === CONTRACTS.WRX && tokenOut.isNative;
@@ -506,7 +513,7 @@
 
                     if (!activeAmount || isNaN(activeAmount) || Number(activeAmount) <= 0 || !isCorrectNetwork) {
                         if (isForward) setAmountOut(''); else setAmountIn('');
-                        setBestRoute(null); setQuoteDetails(null); return;
+                        setBestRoute(null); setQuoteDetails(null); setPoolTooShallow(false); return;
                     }
 
                     if (isDirectAction) {
@@ -517,6 +524,7 @@
                     }
 
                     setIsFetchingQuote(true);
+                    setPoolTooShallow(false);
                     try {
                         const router = new ethers.Contract(CONTRACTS.ROUTER, ROUTER_ABI, provider);
                         const addrIn = getRealAddress(tokenIn);
@@ -570,6 +578,20 @@
                         }
 
                         if (bestPath && bestComputed) {
+                            // Check pool depth: find the pair for the first hop and see if it has >= 1 USDT worth
+                            let shallow = false;
+                            try {
+                                const factory = new ethers.Contract(CONTRACTS.FACTORY, FACTORY_ABI, provider);
+                                const firstPair = await factory.getPair(bestPath[0], bestPath[1]);
+                                if (firstPair && firstPair !== ethers.constants.AddressZero) {
+                                    const pair = new ethers.Contract(firstPair, PAIR_ABI, provider);
+                                    const reserves = await pair.getReserves();
+                                    const r0 = Number(ethers.utils.formatUnits(reserves[0], 18));
+                                    const r1 = Number(ethers.utils.formatUnits(reserves[1], 18));
+                                    if (r0 < 1 && r1 < 1) shallow = true;
+                                } else { shallow = true; }
+                            } catch(e) { /* if check fails, allow swap */ }
+                            setPoolTooShallow(shallow);
                             if (isForward) setAmountOut(bestComputed); else setAmountIn(bestComputed);
                             setBestRoute(bestPath);
                             
@@ -599,11 +621,11 @@
                             setShowDetails(true);
                         } else {
                             if (isForward) setAmountOut(''); else setAmountIn('');
-                            setBestRoute(null); setQuoteDetails(null); setShowDetails(false);
+                            setBestRoute(null); setQuoteDetails(null); setShowDetails(false); setPoolTooShallow(false);
                         }
                     } catch (e) {
                         if (isForward) setAmountOut(''); else setAmountIn('');
-                        setBestRoute(null); setQuoteDetails(null); setShowDetails(false);
+                        setBestRoute(null); setQuoteDetails(null); setShowDetails(false); setPoolTooShallow(false);
                     } 
                     finally { setIsFetchingQuote(false); }
                 };
@@ -666,7 +688,9 @@
             };
 
             const isInsufficient = Number(amountIn) > Number(balanceIn);
-            const btnDisabled = !account || !isCorrectNetwork || !amountIn || isFetchingQuote || isSwapping || isInsufficient || (!amountOut && !isDirectAction);
+            const impactNum = quoteDetails && quoteDetails.priceImpact !== '< 0.01' ? Number(quoteDetails.priceImpact) : 0;
+            const impactTooHigh = !isDirectAction && impactNum > slippage;
+            const btnDisabled = !account || !isCorrectNetwork || !amountIn || isFetchingQuote || isSwapping || isInsufficient || (!amountOut && !isDirectAction) || poolTooShallow || impactTooHigh;
             
             let btnText = t.swapBtn;
             if (isWrap) btnText = t.wrap;
@@ -934,9 +958,13 @@
             const [balanceA, setBalanceA] = useState('0');
             const [balanceB, setBalanceB] = useState('0');
             const [reserves, setReserves] = useState(null); 
+            const [ratioLocked, setRatioLocked] = useState(true);
             
             const [isAdding, setIsAdding] = useState(false);
             const [showModalFor, setShowModalFor] = useState(null);
+
+            const isPoolEmpty = !reserves || reserves.rA < 1 || reserves.rB < 1;
+            const shouldAutoCalc = ratioLocked && !isPoolEmpty && reserves && reserves.rA > 0;
 
             useEffect(() => {
                 if(!account || !provider || !isCorrectNetwork) return;
@@ -974,48 +1002,78 @@
                 fetchReserves();
             }, [provider, isCorrectNetwork, tokenA, tokenB]);
 
-            const handleInputA = (val) => { setAmountA(val); if(reserves && reserves.rA > 0 && val > 0) setAmountB(((val * reserves.rB) / reserves.rA).toFixed(6)); };
-            const handleInputB = (val) => { setAmountB(val); if(reserves && reserves.rB > 0 && val > 0) setAmountA(((val * reserves.rA) / reserves.rB).toFixed(6)); };
+            const handleInputA = (val) => { setAmountA(val); if(shouldAutoCalc && val > 0) setAmountB(((val * reserves.rB) / reserves.rA).toFixed(6)); };
+            const handleInputB = (val) => { setAmountB(val); if(shouldAutoCalc && val > 0) setAmountA(((val * reserves.rA) / reserves.rB).toFixed(6)); };
 
             const executeAddLiquidity = async () => {
                 if(!signer || !amountA || !amountB) return;
                 setIsAdding(true);
                 try {
-                    const router = new ethers.Contract(CONTRACTS.ROUTER, ROUTER_ABI, signer);
                     const parsedA = ethers.utils.parseUnits(amountA.toString(), tokenA.decimals);
                     const parsedB = ethers.utils.parseUnits(amountB.toString(), tokenB.decimals);
                     const deadlineUnix = Math.floor(Date.now()/1000) + 60*deadline;
-                    
-                    const approveIfNeeded = async (token, amount) => {
-                        if(token.isNative) return;
-                        const contract = new ethers.Contract(token.address, ERC20_ABI, signer);
-                        const allowance = await contract.allowance(account, CONTRACTS.ROUTER);
-                        if(allowance.lt(amount)){
-                            showToast(`${t.approvalNeeded} ${token.symbol}`, 'success');
-                            const tx = await contract.approve(CONTRACTS.ROUTER, ethers.constants.MaxUint256);
-                            await tx.wait();
-                        }
-                    };
 
-                    await approveIfNeeded(tokenA, parsedA); await approveIfNeeded(tokenB, parsedB);
-                    showToast(t.confirming, 'success');
-                    let tx;
-                    if(tokenA.isNative || tokenB.isNative) {
-                        const nativeToken = tokenA.isNative ? tokenA : tokenB;
-                        const ercToken = tokenA.isNative ? tokenB : tokenA;
-                        const nativeAmt = tokenA.isNative ? parsedA : parsedB;
-                        const ercAmt = tokenA.isNative ? parsedB : parsedA;
-                        const ercAmtMin = ercAmt.mul(Math.floor((1 - slippage/100)*1000)).div(1000);
-                        const nativeAmtMin = nativeAmt.mul(Math.floor((1 - slippage/100)*1000)).div(1000);
-                        tx = await router.addLiquidityETH(ercToken.address, ercAmt, ercAmtMin, nativeAmtMin, account, deadlineUnix, { value: nativeAmt });
+                    if (isPoolEmpty) {
+                        // Dust pool: bypass Router, directly transfer tokens to pair and call mint()
+                        const factory = new ethers.Contract(CONTRACTS.FACTORY, FACTORY_ABI, signer);
+                        const pairAddr = await factory.getPair(getRealAddress(tokenA), getRealAddress(tokenB));
+                        const pair = new ethers.Contract(pairAddr, PAIR_ABI, signer);
+
+                        const sendToken = async (token, amount) => {
+                            if (token.isNative) {
+                                const wrx = new ethers.Contract(CONTRACTS.WRX, WRX_ABI, signer);
+                                const txWrap = await wrx.deposit({ value: amount });
+                                await txWrap.wait();
+                                const wrxErc = new ethers.Contract(CONTRACTS.WRX, ERC20_ABI, signer);
+                                const txTransfer = await wrxErc.transfer(pairAddr, amount);
+                                await txTransfer.wait();
+                            } else {
+                                const erc = new ethers.Contract(token.address, ERC20_ABI, signer);
+                                const txTransfer = await erc.transfer(pairAddr, amount);
+                                await txTransfer.wait();
+                            }
+                        };
+
+                        showToast(t.confirming, 'success');
+                        await sendToken(tokenA, parsedA);
+                        await sendToken(tokenB, parsedB);
+                        const txMint = await pair.mint(account);
+                        await txMint.wait();
                     } else {
-                        const parsedAMin = parsedA.mul(Math.floor((1 - slippage/100)*1000)).div(1000);
-                        const parsedBMin = parsedB.mul(Math.floor((1 - slippage/100)*1000)).div(1000);
-                        tx = await router.addLiquidity(tokenA.address, tokenB.address, parsedA, parsedB, parsedAMin, parsedBMin, account, deadlineUnix);
+                        // Normal pool: use Router
+                        const router = new ethers.Contract(CONTRACTS.ROUTER, ROUTER_ABI, signer);
+                        
+                        const approveIfNeeded = async (token, amount) => {
+                            if(token.isNative) return;
+                            const contract = new ethers.Contract(token.address, ERC20_ABI, signer);
+                            const allowance = await contract.allowance(account, CONTRACTS.ROUTER);
+                            if(allowance.lt(amount)){
+                                showToast(`${t.approvalNeeded} ${token.symbol}`, 'success');
+                                const tx = await contract.approve(CONTRACTS.ROUTER, ethers.constants.MaxUint256);
+                                await tx.wait();
+                            }
+                        };
+
+                        await approveIfNeeded(tokenA, parsedA); await approveIfNeeded(tokenB, parsedB);
+                        showToast(t.confirming, 'success');
+                        const slipMul = Math.floor((1 - slippage/100)*1000);
+                        let tx;
+                        if(tokenA.isNative || tokenB.isNative) {
+                            const ercToken = tokenA.isNative ? tokenB : tokenA;
+                            const nativeAmt = tokenA.isNative ? parsedA : parsedB;
+                            const ercAmt = tokenA.isNative ? parsedB : parsedA;
+                            const ercAmtMin = ercAmt.mul(slipMul).div(1000);
+                            const nativeAmtMin = nativeAmt.mul(slipMul).div(1000);
+                            tx = await router.addLiquidityETH(ercToken.address, ercAmt, ercAmtMin, nativeAmtMin, account, deadlineUnix, { value: nativeAmt });
+                        } else {
+                            const parsedAMin = parsedA.mul(slipMul).div(1000);
+                            const parsedBMin = parsedB.mul(slipMul).div(1000);
+                            tx = await router.addLiquidity(tokenA.address, tokenB.address, parsedA, parsedB, parsedAMin, parsedBMin, account, deadlineUnix);
+                        }
+                        await tx.wait();
                     }
-                    await tx.wait();
                     showToast(t.txSuccess, 'success'); setAmountA(''); setAmountB(''); onBack();
-                } catch(e) { console.error(e); showToast(t.txFailed, 'error'); } 
+                } catch(e) { console.error(e); showToast(e.reason || t.txFailed, 'error'); } 
                 finally { setIsAdding(false); }
             };
 
@@ -1041,7 +1099,15 @@
                             </div>
                         </div>
 
-                        <div className="flex justify-center text-cyan-500 py-1"><IconPlus /></div>
+                        <div className="flex justify-center py-1 relative">
+                            {!isPoolEmpty ? (
+                                <button onClick={() => setRatioLocked(!ratioLocked)} className={`p-2 rounded-full transition-all ${ratioLocked ? 'text-cyan-500 hover:bg-cyan-500/10' : 'text-slate-400 dark:text-gray-500 hover:bg-slate-200/50 dark:hover:bg-dark-700/50'}`} title={ratioLocked ? t.ratioLocked : t.ratioUnlocked}>
+                                    {ratioLocked ? <IconLock /> : <IconUnlock />}
+                                </button>
+                            ) : (
+                                <span className="text-cyan-500"><IconPlus /></span>
+                            )}
+                        </div>
 
                         <div className="glass-input rounded-[2rem] p-5 group">
                             <div className="flex justify-end text-sm text-slate-500 dark:text-gray-400 font-semibold mb-3"><span>{t.balance}: {Number(balanceB).toFixed(4)}</span></div>
@@ -1055,10 +1121,10 @@
                         </div>
                     </div>
 
-                    {reserves && reserves.rA > 0 && (
-                        <div className="mt-5 px-5 py-4 rounded-2xl bg-white/40 dark:bg-dark-800/40 border border-white/50 dark:border-white/5 text-sm font-bold flex justify-between text-slate-700 dark:text-gray-300">
-                            <span>{t.price}</span>
-                            <span>1 {tokenA.symbol} = {(reserves.rB/reserves.rA).toFixed(6)} {tokenB.symbol}</span>
+                    {((reserves && reserves.rA > 0 && !isPoolEmpty && ratioLocked) || (amountA > 0 && amountB > 0 && (isPoolEmpty || !ratioLocked))) && (
+                        <div className="mt-3 px-5 py-4 rounded-2xl bg-white/40 dark:bg-dark-800/40 border border-white/50 dark:border-white/5 text-sm font-bold flex justify-between text-slate-700 dark:text-gray-300">
+                            <span>{isPoolEmpty ? t.emptyPool : t.price}</span>
+                            <span>1 {tokenA.symbol} = {(isPoolEmpty || !ratioLocked) ? (amountA > 0 ? (Number(amountB) / Number(amountA)).toFixed(6) : '—') : (reserves.rB/reserves.rA).toFixed(6)} {tokenB.symbol}</span>
                         </div>
                     )}
 
