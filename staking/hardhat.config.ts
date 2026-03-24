@@ -4,9 +4,9 @@ const ROBOTX_CHAIN_ID = Number(process.env.ROBOTX_CHAIN_ID ?? "2679");
 
 export default defineConfig({
   solidity: {
-    version: "0.8.28",
+    version: "0.8.34",
     settings: {
-      evmVersion: "cancun",
+      evmVersion: "osaka",
       optimizer: {
         enabled: true,
         runs: 200,
