@@ -17,6 +17,7 @@ contract RXStaking is Ownable, ReentrancyGuard {
     uint256 public constant STATIC_RATE_PERIOD = 30 days;
     uint8 public constant MAX_TEAM_DEPTH = 10;
 
+    error InvalidTeamLevel();
     error AlreadyBound();
     error InvalidUpline();
     error UplineNotBound();
@@ -79,6 +80,7 @@ contract RXStaking is Ownable, ReentrancyGuard {
     mapping(address => uint256[]) private userOrderIds;
     mapping(address => address[]) private directMembers;
     mapping(uint256 => Announcement) private announcements;
+    mapping(address => uint8) private teamLevelOverride;
 
     uint256[] private allOrderIds;
     uint256[] private announcementIds;
@@ -128,6 +130,7 @@ contract RXStaking is Ownable, ReentrancyGuard {
     event AdminOrderCreated(uint256 indexed orderId, address indexed user, uint256 amountIn, uint256 principalAmount, uint256 startAt, uint256 endAt);
     event AdminOrderClosed(uint256 indexed orderId, address indexed user, uint256 settledAt);
     event AnnouncementWritten(uint256 indexed announcementId, string locale, bool deleted, uint256 updatedAt);
+    event TeamLevelOverrideSet(address indexed user, uint8 level);
 
     constructor(address initialOwner) Ownable(initialOwner) {}
 
@@ -369,9 +372,22 @@ contract RXStaking is Ownable, ReentrancyGuard {
         emit EmergencyWithdrawal(msg.sender, amount);
     }
 
+    function adminSetTeamLevel(address user, uint8 level) external onlyOwner {
+        if (level > 6) {
+            revert InvalidTeamLevel();
+        }
+        teamLevelOverride[user] = level + 1;
+        emit TeamLevelOverrideSet(user, level);
+    }
+
+    function adminClearTeamLevel(address user) external onlyOwner {
+        teamLevelOverride[user] = 0;
+        emit TeamLevelOverrideSet(user, 0);
+    }
+
     function getAccount(address user) external view returns (AccountView memory viewData) {
         Account storage account = accounts[user];
-        (uint8 level, uint256 teamRewardBps) = getTeamTier(account.teamBusiness);
+        (uint8 level, uint256 teamRewardBps) = _getEffectiveTeamTier(user);
 
         viewData = AccountView({
             inviter: account.inviter,
@@ -507,6 +523,24 @@ contract RXStaking is Ownable, ReentrancyGuard {
         return _pendingStaticReward(order);
     }
 
+    function _getEffectiveTeamTier(address user) internal view returns (uint8 level, uint256 rewardBps) {
+        uint8 ovr = teamLevelOverride[user];
+        if (ovr != 0) {
+            return _teamTierByLevel(ovr - 1);
+        }
+        return getTeamTier(accounts[user].teamBusiness);
+    }
+
+    function _teamTierByLevel(uint8 level) internal pure returns (uint8, uint256) {
+        if (level >= 6) return (6, 2_000);
+        if (level == 5) return (5, 1_700);
+        if (level == 4) return (4, 1_300);
+        if (level == 3) return (3, 1_100);
+        if (level == 2) return (2, 800);
+        if (level == 1) return (1, 500);
+        return (0, 0);
+    }
+
     function getTeamTier(uint256 teamBusiness) public pure returns (uint8 level, uint256 rewardBps) {
         if (teamBusiness >= 25_000_000 ether) {
             return (6, 2_000);
@@ -548,9 +582,9 @@ contract RXStaking is Ownable, ReentrancyGuard {
         uint256 highestPaidBps = 0;
 
         for (uint256 generation = 1; generation <= MAX_TEAM_DEPTH && cursor != address(0); ++generation) {
-            (, uint256 rewardBps) = getTeamTier(accounts[cursor].teamBusiness);
+            (, uint256 rewardBps) = _getEffectiveTeamTier(cursor);
 
-            if (rewardBps > highestPaidBps) {
+            if (rewardBps > highestPaidBps && userOrderIds[cursor].length > 0) {
                 uint256 diffBps = rewardBps - highestPaidBps;
                 uint256 rewardAmount = Math.mulDiv(profitBase, diffBps, BPS_DENOMINATOR);
                 if (rewardAmount != 0) {

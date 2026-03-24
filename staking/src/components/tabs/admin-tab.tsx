@@ -9,6 +9,8 @@ import { useWallet } from "@/components/providers/wallet-provider";
 import {
   adminCloseOrder,
   adminCreateOrder,
+  adminSetTeamLevel,
+  adminClearTeamLevel,
   emergencyWithdraw,
   formatRxAmount,
   fundPool,
@@ -46,6 +48,8 @@ export function AdminTab({ onBack }: { onBack: () => void }) {
   const [announcementSummary, setAnnouncementSummary] = useState("");
   const [announcementContent, setAnnouncementContent] = useState("");
   const [announcementDeleted, setAnnouncementDeleted] = useState(false);
+  const [teamLevelUser, setTeamLevelUser] = useState("");
+  const [teamLevelValue, setTeamLevelValue] = useState("0");
   const [isBusy, setIsBusy] = useState<string | null>(null);
 
   const loadAdminData = async () => {
@@ -227,6 +231,62 @@ export function AdminTab({ onBack }: { onBack: () => void }) {
           >
             {t("createOrderAction")}
           </button>
+        </div>
+      </GlassPanel>
+
+      <GlassPanel>
+        <div className="text-sm font-semibold flex items-center gap-2 mb-3"><ShieldAlert size={16} /> {t("teamLevelOps")}</div>
+        <div className="grid grid-cols-1 gap-3">
+          <input value={teamLevelUser} onChange={(event) => setTeamLevelUser(event.target.value)} placeholder={t("userAddress")} className="w-full rounded-lg border border-light-border dark:border-dark-border bg-light-input dark:bg-dark-input px-3 py-2 text-sm" />
+          <div className="grid grid-cols-7 gap-1.5">
+            {[0, 1, 2, 3, 4, 5, 6].map((lvl) => (
+              <button
+                key={lvl}
+                onClick={() => setTeamLevelValue(lvl.toString())}
+                className={`rounded-lg py-2 text-sm font-semibold transition-colors cursor-pointer ${
+                  teamLevelValue === lvl.toString()
+                    ? "bg-brandLight dark:bg-primary text-white"
+                    : "bg-black/5 dark:bg-white/5 text-light-textMuted dark:text-dark-textMuted"
+                }`}
+              >
+                V{lvl}
+              </button>
+            ))}
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => void runAdminAction(
+                "set-team-level",
+                async () => {
+                  if (!isAddress(teamLevelUser)) {
+                    throw new Error("invalid address");
+                  }
+                  await adminSetTeamLevel(teamLevelUser, Number(teamLevelValue));
+                },
+                t("setTeamLevelSuccess"),
+              )}
+              disabled={isBusy === "set-team-level"}
+              className="flex-1 rounded-lg bg-brandLight dark:bg-primary px-3 py-2 text-sm font-semibold text-white"
+            >
+              {t("setTeamLevelAction")}
+            </button>
+            <button
+              onClick={() => void runAdminAction(
+                "clear-team-level",
+                async () => {
+                  if (!isAddress(teamLevelUser)) {
+                    throw new Error("invalid address");
+                  }
+                  await adminClearTeamLevel(teamLevelUser);
+                },
+                t("clearTeamLevelSuccess"),
+              )}
+              disabled={isBusy === "clear-team-level"}
+              className="rounded-lg bg-black/5 dark:bg-white/5 px-3 py-2 text-sm font-semibold"
+            >
+              {t("clearTeamLevelAction")}
+            </button>
+          </div>
         </div>
       </GlassPanel>
 

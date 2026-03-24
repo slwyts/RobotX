@@ -335,6 +335,18 @@ export async function adminCloseOrder(orderId: bigint) {
   await tx.wait();
 }
 
+export async function adminSetTeamLevel(user: string, level: number) {
+  const contract = await getWriteContract();
+  const tx = await contract.adminSetTeamLevel(user, level);
+  await tx.wait();
+}
+
+export async function adminClearTeamLevel(user: string) {
+  const contract = await getWriteContract();
+  const tx = await contract.adminClearTeamLevel(user);
+  await tx.wait();
+}
+
 export async function writeAnnouncement(params: {
   announcementId?: bigint;
   locale: string;
