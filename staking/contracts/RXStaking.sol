@@ -539,11 +539,14 @@ contract RXStaking is Ownable, ReentrancyGuard {
 
     function _payTeamRewards(address from, uint256 orderId, uint256 profitBase) internal {
         address cursor = accounts[from].inviter;
+        uint256 highestPaidBps = 0;
 
         for (uint256 generation = 1; generation <= MAX_TEAM_DEPTH && cursor != address(0); ++generation) {
-            (uint8 level, uint256 rewardBps) = getTeamTier(accounts[cursor].teamBusiness);
-            if (level != 0 && rewardBps != 0) {
-                uint256 rewardAmount = Math.mulDiv(profitBase, rewardBps, BPS_DENOMINATOR);
+            (, uint256 rewardBps) = getTeamTier(accounts[cursor].teamBusiness);
+
+            if (rewardBps > highestPaidBps) {
+                uint256 diffBps = rewardBps - highestPaidBps;
+                uint256 rewardAmount = Math.mulDiv(profitBase, diffBps, BPS_DENOMINATOR);
                 if (rewardAmount != 0) {
                     if (_tryLimitedNativeTransfer(cursor, rewardAmount)) {
                         emit TeamRewardPaid(cursor, from, orderId, generation, rewardAmount);
@@ -551,6 +554,7 @@ contract RXStaking is Ownable, ReentrancyGuard {
                         emit RewardTransferSkipped(cursor, orderId, rewardAmount, 3, generation);
                     }
                 }
+                highestPaidBps = rewardBps;
             }
 
             cursor = accounts[cursor].inviter;
