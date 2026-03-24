@@ -1,7 +1,8 @@
 export function RayBg() {
   return (
     <svg
-      className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none opacity-80"
+      className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none opacity-80 will-change-transform"
+      style={{ transform: "translateZ(0)" }}
       viewBox="0 0 1401 760"
       preserveAspectRatio="xMidYMid slice"
       fill="none"

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Header } from "@/components/header";
 import { BottomNav } from "@/components/bottom-nav";
 import { ParticleBg } from "@/components/particle-bg";
@@ -38,11 +38,11 @@ export default function HomePage() {
           <Header />
 
           <main className="flex-1 overflow-y-auto p-5 pb-[90px] z-[2] scroll-smooth no-scrollbar relative">
-            {activeTab === "stake" && <StakeTab onNavigate={setActiveTab} />}
-            {activeTab === "team" && <TeamTab />}
-            {activeTab === "news" && <NewsTab />}
-            {activeTab === "mine" && <MineTab onOpenAdmin={() => setActiveTab("admin")} />}
-            {activeTab === "admin" && <AdminTab onBack={() => setActiveTab("mine")} />}
+            <div className={activeTab === "stake" ? "" : "hidden"}><StakeTab onNavigate={setActiveTab} /></div>
+            <div className={activeTab === "team" ? "" : "hidden"}><TeamTab /></div>
+            <div className={activeTab === "news" ? "" : "hidden"}><NewsTab /></div>
+            <div className={activeTab === "mine" ? "" : "hidden"}><Suspense><MineTab onOpenAdmin={() => setActiveTab("admin")} /></Suspense></div>
+            <div className={activeTab === "admin" ? "" : "hidden"}><AdminTab onBack={() => setActiveTab("mine")} /></div>
           </main>
 
           <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />

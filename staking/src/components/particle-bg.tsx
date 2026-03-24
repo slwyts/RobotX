@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useTheme } from "next-themes";
 
 class Particle {
   x: number;
@@ -35,7 +34,6 @@ class Particle {
 
 export function ParticleBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { theme } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -88,12 +86,13 @@ export function ParticleBg() {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
     };
-  }, [theme]);
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="absolute top-0 left-0 w-full h-full z-[1] pointer-events-none"
+      className="absolute top-0 left-0 w-full h-full z-[1] pointer-events-none will-change-transform"
+      style={{ transform: "translateZ(0)" }}
     />
   );
 }
