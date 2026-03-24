@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="zh" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RobotX Swap Pro</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Ethers.js v5 -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        orbitron: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            900: '#0B0C10',
+                            800: '#131419',
+                            700: '#1F2128',
+                        },
+                        robotx: {
+                            cyan: '#22d3ee',
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 15s infinite alternate',
+                        'blob-reverse': 'blob 20s infinite alternate-reverse',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(50px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-40px, 40px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- 使用 Tailwind 的原生 CSS 解析能力实现真正的磨砂玻璃 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            /* 完美的 Next.js / Apple 风格磨砂玻璃卡片 */
+            .glass-card {
+                @apply bg-white/60 dark:bg-dark-800/70 backdrop-blur-2xl border border-white/80 dark:border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.06)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.5)];
+            }
+            /* 输入框专属的内阴影下凹磨砂玻璃 */
+            .glass-input {
+                @apply bg-white/50 dark:bg-black/30 backdrop-blur-lg border border-white/60 dark:border-white/5 shadow-inner hover:border-cyan-400/50 dark:hover:border-cyan-500/30 transition-all duration-300;
+            }
+            /* 悬浮小按钮的磨砂质感 */
+            .glass-btn {
+                @apply bg-white/80 dark:bg-dark-700/80 backdrop-blur-md hover:bg-white dark:hover:bg-gray-700 border border-gray-200/80 dark:border-gray-600 shadow-sm transition-all duration-300;
+            }
+            /* CTA 核心操作按钮的绝美发光阴影 */
+            .btn-primary {
+                @apply bg-cyan-500 hover:bg-cyan-400 text-white dark:text-dark-900 font-bold transition-all shadow-[0_4px_14px_0_rgba(34,211,238,0.39)] dark:shadow-[0_4px_14px_0_rgba(34,211,238,0.2)] hover:shadow-[0_6px_20px_rgba(34,211,238,0.23)] dark:hover:shadow-[0_6px_20px_rgba(34,211,238,0.3)];
+            }
+        }
+
+        body { margin: 0; overflow-x: hidden; background-color: #f8fafc; color: #0f172a; transition: background-color 0.4s ease; }
+        .dark body { background-color: #0B0C10; color: white; }
+
+        ::-webkit-scrollbar { width: 4px; background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #22d3ee; border-radius: 4px; }
+        
+        /* 超大动态背景光球特效 */
+        .bg-fx { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; pointer-events: none; }
+        
+        /* 光球 1 - 左上 Cyan */
+        .bg-fx-orb1 { 
+            position: absolute; top: -20%; left: -10%; width: 90vw; height: 90vw; 
+            background: radial-gradient(circle, rgba(34,211,238,0.25) 0%, rgba(255,255,255,0) 60%); 
+            border-radius: 50%; filter: blur(100px); 
+        }
+        .dark .bg-fx-orb1 { background: radial-gradient(circle, rgba(34,211,238,0.15) 0%, rgba(0,0,0,0) 60%); }
+        
+        /* 光球 2 - 右下 Purple */
+        .bg-fx-orb2 { 
+            position: absolute; bottom: -30%; right: -20%; width: 110vw; height: 110vw; 
+            background: radial-gradient(circle, rgba(168,85,247,0.2) 0%, rgba(255,255,255,0) 60%); 
+            border-radius: 50%; filter: blur(120px); 
+        }
+        .dark .bg-fx-orb2 { background: radial-gradient(circle, rgba(168,85,247,0.1) 0%, rgba(0,0,0,0) 60%); }
+
+        /* 移动端光球增强 */
+        @media (max-width: 640px) {
+            .bg-fx-orb1 { width: 150vw; height: 150vw; top: -30%; left: -30%; filter: blur(60px); background: radial-gradient(circle, rgba(34,211,238,0.35) 0%, rgba(255,255,255,0) 55%); }
+            .dark .bg-fx-orb1 { background: radial-gradient(circle, rgba(34,211,238,0.25) 0%, rgba(0,0,0,0) 55%); }
+            .bg-fx-orb2 { width: 160vw; height: 160vw; bottom: -40%; right: -40%; filter: blur(60px); background: radial-gradient(circle, rgba(168,85,247,0.3) 0%, rgba(255,255,255,0) 55%); }
+            .dark .bg-fx-orb2 { background: radial-gradient(circle, rgba(168,85,247,0.2) 0%, rgba(0,0,0,0) 55%); }
+        }
+
+        /* Toast 动画 */
+        @keyframes toastSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #22d3ee; cursor: pointer; margin-top: -8px; box-shadow: 0 0 12px rgba(34,211,238,0.5); }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; border-radius: 2px; background: #E5E7EB; }
+        .dark input[type=range]::-webkit-slider-runnable-track { background: #2C2F36; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useCallback, useRef } = React;
+
+        // ==========================================
+        // 1. 常量与配置项 (RobotX Mainnet)
+        // ==========================================
+        const CHAIN_INFO = { id: 2679, hex: '0xa77', name: 'RobotX Mainnet', rpc: 'https://rpc.robotxhub.ai', symbol: 'RX', decimals: 18 };
+        const CONTRACTS = {
+            FACTORY: '0x4fdFDBDB98Ddcf9705BBD4f9EDf59728318f52fE',
+            ROUTER: '0x9b9afbe2a70F8EE507f8faBE41114Ad5d9C8A0A4',
+            WRX: '0xB0FB3Db5E5CE86D4cd98BA694E0E42aa0De2D03b',
+            USDT: '0x3D860bc614012d954B22fDC4AC937D1146C7Df2f',
+        };
+
+        const DEFAULT_TOKENS = [
+            { symbol: 'RX', address: 'NATIVE', decimals: 18, name: 'RobotX Native', logoURI: 'logo', isNative: true },
+            { symbol: 'WRX', address: CONTRACTS.WRX, decimals: 18, name: 'Wrapped RX', logoURI: 'logo', isNative: false },
+            { symbol: 'USDT', address: CONTRACTS.USDT, decimals: 18, name: 'Tether USD', logoURI: 'usdt', isNative: false }
+        ];
+
+        // ==========================================
+        // 2. ABI 定义 (扩展 WRX 和 Permit)
+        // ==========================================
+        const ERC20_ABI = [
+            'function balanceOf(address) view returns (uint256)',
+            'function decimals() view returns (uint8)',
+            'function symbol() view returns (string)',
+            'function name() view returns (string)',
+            'function approve(address, uint256) returns (bool)',
+            'function allowance(address, address) view returns (uint256)',
+            'function totalSupply() view returns (uint256)'
+        ];
+
+        const WRX_ABI = ['function deposit() payable', 'function withdraw(uint wad)'];
+
+        const ROUTER_ABI = [
+            'function getAmountsOut(uint amountIn, address[] memory path) view returns (uint[] memory amounts)',
+            'function getAmountsIn(uint amountOut, address[] memory path) view returns (uint[] memory amounts)',
+            'function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)',
+            'function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)',
+            'function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)',
+            'function addLiquidity(address tokenA, address tokenB, uint amountADesired, uint amountBDesired, uint amountAMin, uint amountBMin, address to, uint deadline) external returns (uint amountA, uint amountB, uint liquidity)',
+            'function addLiquidityETH(address token, uint amountTokenDesired, uint amountTokenMin, uint amountETHMin, address to, uint deadline) external payable returns (uint amountToken, uint amountETH, uint liquidity)',
+            'function removeLiquidity(address tokenA, address tokenB, uint liquidity, uint amountAMin, uint amountBMin, address to, uint deadline) external returns (uint amountA, uint amountB)',
+            'function removeLiquidityETH(address token, uint liquidity, uint amountTokenMin, uint amountETHMin, address to, uint deadline) external returns (uint amountToken, uint amountETH)',
+            'function removeLiquidityWithPermit(address tokenA, address tokenB, uint liquidity, uint amountAMin, uint amountBMin, address to, uint deadline, bool approveMax, uint8 v, bytes32 r, bytes32 s) external returns (uint amountA, uint amountB)',
+            'function removeLiquidityETHWithPermit(address token, uint liquidity, uint amountTokenMin, uint amountETHMin, address to, uint deadline, bool approveMax, uint8 v, bytes32 r, bytes32 s) external returns (uint amountToken, uint amountETH)'
+        ];
+
+        const FACTORY_ABI = [
+            'function getPair(address tokenA, address tokenB) view returns (address)',
+            'function allPairsLength() view returns (uint)',
+            'function allPairs(uint) view returns (address)'
+        ];
+
+        const PAIR_ABI = [
+            'function getReserves() view returns (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast)',
+            'function token0() view returns (address)',
+            'function token1() view returns (address)',
+            'function totalSupply() view returns (uint256)',
+            'function balanceOf(address) view returns (uint256)',
+            'function approve(address, uint256) returns (bool)',
+            'function nonces(address) view returns (uint256)',
+            'function name() view returns (string)'
+        ];
+
+        // ==========================================
+        // 3. SVG & Icons 组件库 & 辅助函数
+        // ==========================================
+        const IconDown = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>;
+        const IconSettings = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
+        const IconArrowDown = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>;
+        const IconClose = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>;
+        const IconBack = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>;
+        const IconPlus = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14"/><path d="M12 5v14"/></svg>;
+        const IconSun = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>;
+        const IconMoon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>;
+        const IconWalletAdd = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/><path d="M10 10v4"/><path d="M8 12h4"/></svg>;
+
+        const TokenIcon = ({ token, className = "w-6 h-6 rounded-full" }) => {
+            if (!token) return null;
+            if (token.logoURI === 'logo') {
+                return <img src="/logoa.png" className={`${className} object-contain drop-shadow-sm`} onError={(e)=>{e.target.src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%2322d3ee"><circle cx="50" cy="50" r="50"/></svg>'}} alt={token.symbol} />;
+            }
+            if (token.logoURI === 'usdt') {
+                return (
+                    <svg className={className} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="16" fill="#26A17B"/>
+                        <path d="M17.922 17.383v5.562h-3.844v-5.562c-2.828-.156-4.953-1.047-4.953-2.125s2.125-1.969 4.953-2.125V9.438h3.844v3.688c2.828.156 4.953 1.047 4.953 2.125s-2.125 1.969-4.953 2.125zm-1.922-2.906c-2.344 0-4.328.625-4.328 1.406 0 .781 1.984 1.406 4.328 1.406s4.328-.625 4.328-1.406c0-.781-1.984-1.406-4.328-1.406z" fill="#FFF"/>
+                    </svg>
+                );
+            }
+            if (token.logoURI && token.logoURI.startsWith('http')) {
+                return <img src={token.logoURI} className={className} alt={token.symbol} onError={(e)=>{e.target.style.display='none'; e.target.nextSibling.style.display='flex'}} />;
+            }
+            return (
+                <div className={`${className} bg-gradient-to-br from-gray-400 to-gray-600 dark:from-gray-600 dark:to-gray-800 flex items-center justify-center text-white font-bold text-[10px] shadow-sm`}>
+                    {token.symbol ? token.symbol.substring(0, 2).toUpperCase() : '?'}
+                </div>
+            );
+        };
+
+        const getRealAddress = (token) => token.isNative ? CONTRACTS.WRX : token.address;
+        const shortenAddress = (addr) => (!addr || addr === 'NATIVE') ? '' : `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
+
+        // ==========================================
+        // 4. i18n
+        // ==========================================
+        const I18N = {
+            zh: {
+                swap: '兑换', pool: '流动性', connectWallet: '连接钱包', wrongNetwork: '切换网络',
+                settings: '交易设置', slippage: '最大滑点容差', deadline: '交易截止时间(分钟)',
+                from: '支付', to: '收到', balance: '余额', max: '最大', enterAmount: '输入金额',
+                selectToken: '选择代币', insufficientBalance: '余额不足', swapBtn: '确认兑换',
+                addLiquidity: '添加流动性', removeLiquidity: '移除流动性', importToken: '导入代币', searchPlaceholder: '搜索名称或合约地址',
+                fetching: '获取最佳报价...', price: '汇率', txSuccess: '交易成功', txFailed: '交易失败', 
+                approvalNeeded: '授权中...', approve: '授权', confirming: '请在钱包中确认...',
+                myPositions: '我的仓位', marketPools: '市场池子', noPositions: '未找到流动性仓位',
+                pooled: '已存入', remove: '移除', add: '添加', loadingPools: '加载中...', 
+                youReceive: '预估获得', minReceive: '最低获得', priceImpact: '价格影响', route: '智能路由',
+                wrap: '打包 (Wrap)', unwrap: '解包 (Unwrap)', permitSign: '免Gas签名授权中...', addToWallet: '添加至钱包'
+            },
+            en: {
+                swap: 'Swap', pool: 'Pool', connectWallet: 'Connect Wallet', wrongNetwork: 'Switch Network',
+                settings: 'Settings', slippage: 'Max Slippage', deadline: 'Deadline (mins)',
+                from: 'Pay', to: 'Receive', balance: 'Balance', max: 'Max', enterAmount: 'Enter amount',
+                selectToken: 'Select token', insufficientBalance: 'Insufficient Balance', swapBtn: 'Swap',
+                addLiquidity: 'Add Liquidity', removeLiquidity: 'Remove Liquidity', importToken: 'Import Token', searchPlaceholder: 'Search name or address',
+                fetching: 'Fetching best quote...', price: 'Rate', txSuccess: 'Transaction Success', txFailed: 'Transaction Failed', 
+                approvalNeeded: 'Approving...', approve: 'Approve', confirming: 'Confirm in wallet...',
+                myPositions: 'My Positions', marketPools: 'Market Pools', noPositions: 'No liquidity positions found.',
+                pooled: 'Pooled', remove: 'Remove', add: 'Add', loadingPools: 'Loading...', 
+                youReceive: 'Est. Receive', minReceive: 'Minimum Received', priceImpact: 'Price Impact', route: 'Smart Route',
+                wrap: 'Wrap', unwrap: 'Unwrap', permitSign: 'Sign Permit (Gasless)...', addToWallet: 'Add to Wallet'
+            }
+        };
+
+        // UI Components
+        const Modal = ({ isOpen, onClose, title, children }) => {
+            if (!isOpen) return null;
+            return ReactDOM.createPortal(
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/10 dark:bg-black/60 backdrop-blur-lg px-4 transition-all duration-300">
+                    <div className="glass-card rounded-[2rem] w-full max-w-md p-6 relative animate-[fadeIn_0.2s_ease-out] shadow-2xl">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-bold text-slate-800 dark:text-white">{title}</h3>
+                            <button onClick={onClose} className="text-slate-400 hover:text-cyan-500 dark:text-gray-500 dark:hover:text-cyan-400 transition"><IconClose /></button>
+                        </div>
+                        {children}
+                    </div>
+                </div>,
+                document.body
+            );
+        };
+
+        const Toast = ({ message, type, onClose }) => {
+            const [exiting, setExiting] = useState(false);
+            useEffect(() => {
+                const fadeTimer = setTimeout(() => setExiting(true), 2600);
+                const removeTimer = setTimeout(onClose, 3000);
+                return () => { clearTimeout(fadeTimer); clearTimeout(removeTimer); };
+            }, [onClose]);
+            const isError = type === 'error';
+            return ReactDOM.createPortal(
+                <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-8 z-[60] transition-all duration-400 ${exiting ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}
+                     style={{ animation: 'toastSlideUp 0.35s cubic-bezier(0.16,1,0.3,1)' }}>
+                    <div className="flex items-center gap-3 px-5 py-3.5 rounded-2xl border shadow-2xl backdrop-blur-2xl"
+                         style={{
+                             background: isError ? 'rgba(239,68,68,0.12)' : 'rgba(34,211,238,0.10)',
+                             borderColor: isError ? 'rgba(239,68,68,0.25)' : 'rgba(34,211,238,0.25)',
+                             boxShadow: isError ? '0 8px 32px rgba(239,68,68,0.15), 0 0 0 1px rgba(239,68,68,0.08)' : '0 8px 32px rgba(34,211,238,0.15), 0 0 0 1px rgba(34,211,238,0.08)',
+                         }}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isError ? 'bg-red-500/20' : 'bg-cyan-500/20'}`}>
+                            {isError ? (
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                            ) : (
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" strokeWidth="2.5" strokeLinecap="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            )}
+                        </div>
+                        <span className={`font-semibold text-sm ${isError ? 'text-red-500 dark:text-red-400' : 'text-cyan-600 dark:text-cyan-400'}`}>{message}</span>
+                    </div>
+                </div>,
+                document.body
+            );
+        };
+
+        // ==========================================
+        // 5. 主应用组件 App
+        // ==========================================
+        function App() {
+            const [lang, setLang] = useState('zh');
+            // 初始化检查系统偏好或 localStorage
+            const [theme, setTheme] = useState(() => {
+                const saved = localStorage.getItem('robotx_theme');
+                if (saved) return saved;
+                return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            });
+            const [tab, setTab] = useState('swap'); 
+            const [account, setAccount] = useState('');
+            const [provider, setProvider] = useState(null);
+            const [signer, setSigner] = useState(null);
+            const [chainId, setChainId] = useState(null);
+            const [toast, setToast] = useState(null);
+            const [customTokens, setCustomTokens] = useState([]);
+            
+            const [slippage, setSlippage] = useState(3.0);
+            const [deadline, setDeadline] = useState(20); 
+            const [showSettings, setShowSettings] = useState(false);
+
+            const t = I18N[lang];
+            const showToast = (msg, type = 'success') => setToast({ message: msg, type });
+
+            // 监听主题切换并持久化
+            useEffect(() => {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('robotx_theme', theme);
+            }, [theme]);
+
+            useEffect(() => {
+                if (window.ethereum) {
+                    const initProvider = new ethers.providers.Web3Provider(window.ethereum);
+                    setProvider(initProvider);
+                    window.ethereum.on('accountsChanged', (accounts) => {
+                        if (accounts.length > 0) { setAccount(accounts[0]); setSigner(initProvider.getSigner()); } 
+                        else { setAccount(''); setSigner(null); }
+                    });
+                    window.ethereum.on('chainChanged', () => window.location.reload());
+                    initProvider.listAccounts().then(accounts => {
+                        if (accounts.length > 0) { setAccount(accounts[0]); setSigner(initProvider.getSigner()); }
+                    });
+                    initProvider.getNetwork().then(network => setChainId(network.chainId));
+                }
+                const savedTokens = localStorage.getItem('robotx_custom_tokens');
+                if(savedTokens) setCustomTokens(JSON.parse(savedTokens));
+            }, []);
+
+            const connectWallet = async () => {
+                if (!window.ethereum) return showToast('请安装 Web3 钱包', 'error');
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    setAccount(accounts[0]); setSigner(provider.getSigner());
+                    const network = await provider.getNetwork(); setChainId(network.chainId);
+                    if (network.chainId !== CHAIN_INFO.id) await switchNetwork();
+                } catch (error) { showToast('连接取消', 'error'); }
+            };
+
+            const switchNetwork = async () => {
+                try {
+                    await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_INFO.hex }] });
+                } catch (error) {
+                    if (error.code === 4902) {
+                        try {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{ chainId: CHAIN_INFO.hex, chainName: CHAIN_INFO.name, nativeCurrency: { name: CHAIN_INFO.symbol, symbol: CHAIN_INFO.symbol, decimals: CHAIN_INFO.decimals }, rpcUrls: [CHAIN_INFO.rpc] }],
+                            });
+                        } catch (e) { showToast('添加网络失败', 'error'); }
+                    } else { showToast('切换失败', 'error'); }
+                }
+            };
+
+            const isCorrectNetwork = chainId === CHAIN_INFO.id;
+            const allTokens = [...DEFAULT_TOKENS, ...customTokens];
+
+            return (
+                <div className="min-h-screen relative flex flex-col items-center pb-20 font-sans">
+                    <div className="bg-fx"><div className="bg-fx-orb1 animate-blob"></div><div className="bg-fx-orb2 animate-blob-reverse"></div></div>
+
+                    {/* Navbar */}
+                    <header className="w-full flex justify-between items-center p-4 sm:p-6 max-w-7xl mx-auto z-10">
+                        <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.location.reload()}>
+                            <img src="/logoa.png" alt="RobotX" className="w-[57px] h-[57px] object-contain drop-shadow-md transition-transform hover:scale-105" onError={(e)=>{e.target.src='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="%2322d3ee"><circle cx="50" cy="50" r="50"/></svg>'}}/>
+                            <span className="text-2xl font-black tracking-wider font-orbitron hidden sm:block drop-shadow-md"><span className="text-cyan-500">ROBOT</span><span className="text-slate-800 dark:text-white">X</span></span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="glass-btn p-2.5 rounded-xl text-slate-600 dark:text-gray-300">
+                                {theme === 'dark' ? <IconSun /> : <IconMoon />}
+                            </button>
+                            <button onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')} className="glass-btn text-sm px-4 py-2.5 rounded-xl text-slate-700 dark:text-gray-200 font-bold">
+                                {lang === 'zh' ? 'EN' : '中'}
+                            </button>
+                            {account ? (
+                                isCorrectNetwork ? (
+                                    <div className="glass-card px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 text-slate-800 dark:text-white border-white/40 dark:border-white/10">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
+                                        {shortenAddress(account)}
+                                    </div>
+                                ) : ( <button onClick={switchNetwork} className="bg-red-500 text-white shadow-lg shadow-red-500/30 hover:bg-red-400 px-5 py-2.5 rounded-xl text-sm font-bold transition">{t.wrongNetwork}</button> )
+                            ) : ( <button onClick={connectWallet} className="btn-primary px-6 py-2.5 rounded-xl text-sm transition">{t.connectWallet}</button> )}
+                        </div>
+                    </header>
+
+                    {/* Main Area */}
+                    <main className="flex-1 w-full max-w-[480px] px-4 pt-8 z-10">
+                        <div className="flex justify-center gap-8 mb-8">
+                            <button onClick={() => setTab('swap')} className={`text-lg font-bold transition-all px-2 ${tab === 'swap' ? 'text-slate-900 dark:text-white border-b-2 border-cyan-500 pb-1' : 'text-slate-500 hover:text-slate-700 dark:text-gray-500 dark:hover:text-gray-300 pb-1 border-b-2 border-transparent'}`}>{t.swap}</button>
+                            <button onClick={() => setTab('pool')} className={`text-lg font-bold transition-all px-2 ${tab === 'pool' ? 'text-slate-900 dark:text-white border-b-2 border-cyan-500 pb-1' : 'text-slate-500 hover:text-slate-700 dark:text-gray-500 dark:hover:text-gray-300 pb-1 border-b-2 border-transparent'}`}>{t.pool}</button>
+                        </div>
+
+                        {tab === 'swap' ? (
+                            <SwapModule account={account} provider={provider} signer={signer} isCorrectNetwork={isCorrectNetwork} t={t} showToast={showToast} allTokens={allTokens} slippage={slippage} deadline={deadline} setShowSettings={setShowSettings} setCustomTokens={setCustomTokens} customTokens={customTokens} />
+                        ) : (
+                            <PoolManager account={account} provider={provider} signer={signer} isCorrectNetwork={isCorrectNetwork} t={t} showToast={showToast} allTokens={allTokens} slippage={slippage} deadline={deadline} setCustomTokens={setCustomTokens} customTokens={customTokens} setShowSettings={setShowSettings} />
+                        )}
+                    </main>
+
+                    {/* Settings Modal */}
+                    <Modal isOpen={showSettings} onClose={() => setShowSettings(false)} title={t.settings}>
+                        <div className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-600 dark:text-gray-400 mb-3">{t.slippage} (%)</label>
+                                <div className="flex gap-2">
+                                    {[0.6, 1.0, 3.0, 5.0].map(val => (
+                                        <button key={val} onClick={() => setSlippage(val)} className={`flex-1 py-2.5 rounded-xl font-bold transition-all border ${slippage === val ? 'bg-cyan-500/10 border-cyan-500 text-cyan-600 dark:text-cyan-400' : 'glass-input text-slate-700 dark:text-gray-300'}`}>{val}%</button>
+                                    ))}
+                                    <input type="number" className="w-20 glass-input rounded-xl text-center focus:border-cyan-500 outline-none font-bold text-slate-900 dark:text-white" value={slippage} onChange={(e) => setSlippage(parseFloat(e.target.value) || 0)} />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-600 dark:text-gray-400 mb-3">{t.deadline}</label>
+                                <input type="number" className="w-full glass-input p-4 rounded-xl focus:border-cyan-500 outline-none font-bold text-slate-900 dark:text-white" value={deadline} onChange={(e) => setDeadline(parseInt(e.target.value) || 20)} />
+                            </div>
+                        </div>
+                    </Modal>
+
+                    {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 6. 兑换模块 (Swap)
+        // ==========================================
+        function SwapModule({ account, provider, signer, isCorrectNetwork, t, showToast, allTokens, slippage, deadline, setShowSettings, setCustomTokens, customTokens }) {
+            const [tokenIn, setTokenIn] = useState(allTokens[0]);
+            const [tokenOut, setTokenOut] = useState(allTokens[2]);
+            const [amountIn, setAmountIn] = useState('');
+            const [amountOut, setAmountOut] = useState('');
+            const [balanceIn, setBalanceIn] = useState('0');
+            const [balanceOut, setBalanceOut] = useState('0');
+            
+            const [isFetchingQuote, setIsFetchingQuote] = useState(false);
+            const [isSwapping, setIsSwapping] = useState(false);
+            const [showTokenModal, setShowTokenModal] = useState(false);
+            const [selectingFor, setSelectingFor] = useState('in');
+
+            const [bestRoute, setBestRoute] = useState(null);
+            const [quoteDetails, setQuoteDetails] = useState(null);
+            const [showDetails, setShowDetails] = useState(false);
+            const [inputDirection, setInputDirection] = useState('in');
+
+            const isWrap = tokenIn.isNative && tokenOut.address === CONTRACTS.WRX;
+            const isUnwrap = tokenIn.address === CONTRACTS.WRX && tokenOut.isNative;
+            const isDirectAction = isWrap || isUnwrap;
+
+            const fetchBalances = useCallback(async () => {
+                if (!account || !provider || !isCorrectNetwork) return;
+                try {
+                    const getBal = async (tok) => {
+                        if (tok.isNative) return ethers.utils.formatEther(await provider.getBalance(account));
+                        const contract = new ethers.Contract(tok.address, ERC20_ABI, provider);
+                        return ethers.utils.formatUnits(await contract.balanceOf(account), tok.decimals);
+                    };
+                    setBalanceIn(await getBal(tokenIn));
+                    setBalanceOut(await getBal(tokenOut));
+                } catch (e) { console.error(e); }
+            }, [account, provider, isCorrectNetwork, tokenIn, tokenOut]);
+
+            useEffect(() => { fetchBalances(); }, [fetchBalances]);
+
+            useEffect(() => {
+                const fetchQuote = async () => {
+                    const isForward = inputDirection === 'in';
+                    const activeAmount = isForward ? amountIn : amountOut;
+
+                    if (!activeAmount || isNaN(activeAmount) || Number(activeAmount) <= 0 || !isCorrectNetwork) {
+                        if (isForward) setAmountOut(''); else setAmountIn('');
+                        setBestRoute(null); setQuoteDetails(null); return;
+                    }
+
+                    if (isDirectAction) {
+                        if (isForward) setAmountOut(amountIn); else setAmountIn(amountOut);
+                        setQuoteDetails({ price: 1, priceImpact: 0, minReceived: activeAmount });
+                        setBestRoute([tokenIn.address, tokenOut.address]);
+                        return;
+                    }
+
+                    setIsFetchingQuote(true);
+                    try {
+                        const router = new ethers.Contract(CONTRACTS.ROUTER, ROUTER_ABI, provider);
+                        const addrIn = getRealAddress(tokenIn);
+                        const addrOut = getRealAddress(tokenOut);
+                        
+                        const possiblePaths = [
+                            [addrIn, addrOut],
+                            [addrIn, CONTRACTS.WRX, addrOut],
+                            [addrIn, CONTRACTS.USDT, addrOut]
+                        ].filter(path => {
+                            const set = new Set(path.map(p=>p.toLowerCase()));
+                            return set.size === path.length;
+                        });
+
+                        let bestResult = ethers.BigNumber.from(0);
+                        let bestPath = null;
+                        let bestComputed = null;
+
+                        if (isForward) {
+                            const parsedAmountIn = ethers.utils.parseUnits(amountIn.toString(), tokenIn.decimals);
+                            const results = await Promise.allSettled(
+                                possiblePaths.map(p => router.getAmountsOut(parsedAmountIn, p))
+                            );
+                            results.forEach((res, index) => {
+                                if (res.status === 'fulfilled') {
+                                    const out = res.value[res.value.length - 1];
+                                    if (out.gt(bestResult)) {
+                                        bestResult = out;
+                                        bestPath = possiblePaths[index];
+                                        bestComputed = ethers.utils.formatUnits(out, tokenOut.decimals);
+                                    }
+                                }
+                            });
+                        } else {
+                            const parsedAmountOut = ethers.utils.parseUnits(amountOut.toString(), tokenOut.decimals);
+                            let bestAmountIn = null;
+                            const results = await Promise.allSettled(
+                                possiblePaths.map(p => router.getAmountsIn(parsedAmountOut, p))
+                            );
+                            results.forEach((res, index) => {
+                                if (res.status === 'fulfilled') {
+                                    const inAmt = res.value[0];
+                                    if (!bestAmountIn || inAmt.lt(bestAmountIn)) {
+                                        bestAmountIn = inAmt;
+                                        bestResult = inAmt;
+                                        bestPath = possiblePaths[index];
+                                        bestComputed = ethers.utils.formatUnits(inAmt, tokenIn.decimals);
+                                    }
+                                }
+                            });
+                        }
+
+                        if (bestPath && bestComputed) {
+                            if (isForward) setAmountOut(bestComputed); else setAmountIn(bestComputed);
+                            setBestRoute(bestPath);
+                            
+                            const inVal = isForward ? Number(amountIn) : Number(bestComputed);
+                            const outVal = isForward ? Number(bestComputed) : Number(amountOut);
+                            const execRate = outVal / inVal;
+                            const minReceived = outVal * (1 - slippage / 100);
+
+                            // Calculate price impact: compare spot price (tiny trade) vs execution price
+                            let impact = 0;
+                            try {
+                                const oneUnit = ethers.utils.parseUnits('1', tokenIn.decimals);
+                                const spotResult = await router.getAmountsOut(oneUnit, bestPath);
+                                const spotOut = Number(ethers.utils.formatUnits(spotResult[spotResult.length - 1], tokenOut.decimals));
+                                // spotOut = how much 1 tokenIn gets at spot price
+                                // execRate = how much 1 tokenIn gets at execution price
+                                if (spotOut > 0) {
+                                    impact = Math.max(0, ((spotOut - execRate) / spotOut) * 100);
+                                }
+                            } catch(e) { impact = 0; }
+
+                            setQuoteDetails({
+                                price: execRate,
+                                minReceived: minReceived.toFixed(6),
+                                priceImpact: impact < 0.01 ? '< 0.01' : impact.toFixed(2)
+                            });
+                            setShowDetails(true);
+                        } else {
+                            if (isForward) setAmountOut(''); else setAmountIn('');
+                            setBestRoute(null); setQuoteDetails(null); setShowDetails(false);
+                        }
+                    } catch (e) {
+                        if (isForward) setAmountOut(''); else setAmountIn('');
+                        setBestRoute(null); setQuoteDetails(null); setShowDetails(false);
+                    } 
+                    finally { setIsFetchingQuote(false); }
+                };
+
+                const timeoutId = setTimeout(fetchQuote, 500);
+                return () => clearTimeout(timeoutId);
+            }, [amountIn, amountOut, inputDirection, tokenIn, tokenOut, provider, isCorrectNetwork, isDirectAction, slippage]);
+
+            const switchTokens = () => { const temp = tokenIn; setTokenIn(tokenOut); setTokenOut(temp); setAmountIn(amountOut); setAmountOut(''); setInputDirection('in'); };
+
+            const executeSwap = async () => {
+                if (!signer || !amountIn || (!amountOut && !isDirectAction)) return;
+                setIsSwapping(true);
+                try {
+                    const parsedAmountIn = ethers.utils.parseUnits(amountIn.toString(), tokenIn.decimals);
+
+                    if (isWrap) {
+                        showToast(t.confirming, 'success');
+                        const wrxContract = new ethers.Contract(CONTRACTS.WRX, WRX_ABI, signer);
+                        const tx = await wrxContract.deposit({ value: parsedAmountIn });
+                        await tx.wait();
+                        showToast(t.txSuccess, 'success');
+                    } 
+                    else if (isUnwrap) {
+                        showToast(t.confirming, 'success');
+                        const wrxContract = new ethers.Contract(CONTRACTS.WRX, WRX_ABI, signer);
+                        const tx = await wrxContract.withdraw(parsedAmountIn);
+                        await tx.wait();
+                        showToast(t.txSuccess, 'success');
+                    } 
+                    else {
+                        const router = new ethers.Contract(CONTRACTS.ROUTER, ROUTER_ABI, signer);
+                        const outMinAmount = Number(amountOut) * (1 - slippage / 100);
+                        const parsedAmountOutMin = ethers.utils.parseUnits(outMinAmount.toFixed(tokenOut.decimals), tokenOut.decimals);
+                        const deadlineUnix = Math.floor(Date.now() / 1000) + 60 * deadline;
+
+                        if (!tokenIn.isNative) {
+                            const tokenContract = new ethers.Contract(tokenIn.address, ERC20_ABI, signer);
+                            const allowance = await tokenContract.allowance(account, CONTRACTS.ROUTER);
+                            if (allowance.lt(parsedAmountIn)) {
+                                showToast(t.approvalNeeded, 'success');
+                                const tx = await tokenContract.approve(CONTRACTS.ROUTER, ethers.constants.MaxUint256);
+                                await tx.wait();
+                            }
+                        }
+
+                        showToast(t.confirming, 'success');
+                        let tx;
+                        if (tokenIn.isNative) tx = await router.swapExactETHForTokens(parsedAmountOutMin, bestRoute, account, deadlineUnix, { value: parsedAmountIn });
+                        else if (tokenOut.isNative) tx = await router.swapExactTokensForETH(parsedAmountIn, parsedAmountOutMin, bestRoute, account, deadlineUnix);
+                        else tx = await router.swapExactTokensForTokens(parsedAmountIn, parsedAmountOutMin, bestRoute, account, deadlineUnix);
+                        
+                        await tx.wait();
+                        showToast(t.txSuccess, 'success');
+                    }
+                    
+                    setAmountIn(''); fetchBalances();
+                } catch (e) { console.error(e); showToast(e.reason || t.txFailed, 'error'); } 
+                finally { setIsSwapping(false); }
+            };
+
+            const isInsufficient = Number(amountIn) > Number(balanceIn);
+            const btnDisabled = !account || !isCorrectNetwork || !amountIn || isFetchingQuote || isSwapping || isInsufficient || (!amountOut && !isDirectAction);
+            
+            let btnText = t.swapBtn;
+            if (isWrap) btnText = t.wrap;
+            else if (isUnwrap) btnText = t.unwrap;
+
+            if (!account) btnText = t.connectWallet;
+            else if (!isCorrectNetwork) btnText = t.wrongNetwork;
+            else if (isInsufficient) btnText = t.insufficientBalance;
+            else if (isSwapping) btnText = t.confirming;
+
+            const renderRoute = () => {
+                if (!bestRoute || bestRoute.length <= 1 || isDirectAction) return null;
+                return (
+                    <div className="flex items-center gap-1.5 text-xs font-bold bg-slate-100 dark:bg-dark-700 px-3 py-1.5 rounded-lg">
+                        {bestRoute.map((addr, idx) => {
+                            const tok = allTokens.find(t => t.address.toLowerCase() === addr.toLowerCase()) || {symbol: shortenAddress(addr)};
+                            return (
+                                <React.Fragment key={idx}>
+                                    <span className="text-slate-700 dark:text-white">{tok.symbol}</span>
+                                    {idx < bestRoute.length - 1 && <span className="text-slate-400 dark:text-gray-500">→</span>}
+                                </React.Fragment>
+                            );
+                        })}
+                    </div>
+                );
+            };
+
+            return (
+                <div className="glass-card rounded-[2.5rem] p-2.5 w-full relative z-10">
+                    <div className="flex justify-between items-center p-4 mb-1">
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t.swap}</h2>
+                        <button onClick={() => setShowSettings(true)} className="text-slate-400 hover:text-cyan-500 dark:text-gray-500 dark:hover:text-cyan-400 transition"><IconSettings /></button>
+                    </div>
+
+                    {/* From */}
+                    <div className="glass-input rounded-[2rem] p-5 mb-1 group">
+                        <div className="flex justify-between text-sm text-slate-500 dark:text-gray-400 font-semibold mb-3">
+                            <span>{t.from}</span><span>{t.balance}: {Number(balanceIn).toFixed(4)}</span>
+                        </div>
+                        <div className="flex justify-between items-center gap-4">
+                            <input type="number" placeholder="0.0" className="bg-transparent text-4xl font-bold text-slate-900 dark:text-white outline-none w-full flex-1 min-w-0" value={amountIn} onChange={(e) => { setInputDirection('in'); setAmountIn(e.target.value); }} />
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => setAmountIn(tokenIn.isNative ? (Number(balanceIn)*0.99).toString() : balanceIn)} className="text-cyan-600 dark:text-cyan-400 bg-cyan-500/10 px-2 py-1 rounded-lg text-xs font-bold uppercase hover:bg-cyan-500/20">{t.max}</button>
+                                <button onClick={() => { setSelectingFor('in'); setShowTokenModal(true); }} className="glass-btn flex items-center gap-2 rounded-full py-1.5 pl-2 pr-3 whitespace-nowrap">
+                                    <TokenIcon token={tokenIn} />
+                                    <span className="font-bold text-slate-800 dark:text-white text-lg">{tokenIn.symbol}</span><IconDown />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="relative flex justify-center -my-5 z-20">
+                        <button onClick={switchTokens} className="bg-white dark:bg-dark-800 border-4 border-[#f8fafc] dark:border-[#0B0C10] p-2.5 rounded-2xl text-slate-400 hover:text-cyan-500 dark:text-gray-400 dark:hover:text-cyan-400 shadow-sm transition group">
+                            <div className="transform group-hover:rotate-180 transition duration-300"><IconArrowDown /></div>
+                        </button>
+                    </div>
+
+                    {/* To */}
+                    <div className="glass-input rounded-[2rem] p-5 mt-1">
+                        <div className="flex justify-between text-sm text-slate-500 dark:text-gray-400 font-semibold mb-3">
+                            <span>{t.to}</span><span>{t.balance}: {Number(balanceOut).toFixed(4)}</span>
+                        </div>
+                        <div className="flex justify-between items-center gap-4">
+                            <input type="number" placeholder="0.0" className="bg-transparent text-4xl font-bold text-slate-900 dark:text-white outline-none w-full flex-1 min-w-0 placeholder-slate-300 dark:placeholder-gray-600" value={isFetchingQuote && inputDirection === 'in' ? '...' : amountOut} onChange={(e) => { setInputDirection('out'); setAmountOut(e.target.value); }} />
+                            <button onClick={() => { setSelectingFor('out'); setShowTokenModal(true); }} className="btn-primary flex items-center gap-2 rounded-full py-1.5 pl-2 pr-3 whitespace-nowrap shadow-md hover:shadow-lg">
+                                <TokenIcon token={tokenOut} className="w-6 h-6 rounded-full border border-white/20" />
+                                <span className="font-bold text-lg">{tokenOut.symbol}</span><IconDown />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* 详情折叠面板 */}
+                    {quoteDetails && !isDirectAction && (
+                        <div className="px-5 py-4 mt-2 rounded-3xl bg-white/40 dark:bg-dark-800/40 border border-white/50 dark:border-white/5 text-sm">
+                            <div className="flex justify-between items-center font-semibold mb-2 cursor-pointer" onClick={() => setShowDetails(!showDetails)}>
+                                <span className="text-slate-600 dark:text-gray-400">{t.price}</span>
+                                <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold">
+                                    1 {tokenIn.symbol} = {quoteDetails.price.toFixed(6)} {tokenOut.symbol}
+                                    <IconDown className={`w-4 h-4 transform transition-transform ${showDetails ? 'rotate-180' : ''}`} />
+                                </div>
+                            </div>
+                            
+                            {showDetails && (
+                                <div className="space-y-3 pt-3 border-t border-slate-200 dark:border-dark-700 animate-[fadeIn_0.2s_ease-out]">
+                                    <div className="flex justify-between text-slate-500 dark:text-gray-400 font-medium">
+                                        <span>{t.minReceive}</span>
+                                        <span className="font-bold text-slate-900 dark:text-white">{quoteDetails.minReceived} {tokenOut.symbol}</span>
+                                    </div>
+                                    <div className="flex justify-between text-slate-500 dark:text-gray-400 font-medium">
+                                        <span>{t.priceImpact}</span>
+                                        <span className={`font-bold ${Number(quoteDetails.priceImpact) > 5 ? 'text-red-500' : 'text-green-500'}`}>
+                                            {quoteDetails.priceImpact}%
+                                        </span>
+                                    </div>
+                                    {bestRoute && bestRoute.length > 2 && (
+                                        <div className="flex justify-between items-center text-slate-500 dark:text-gray-400 font-medium">
+                                            <span>{t.route}</span>
+                                            {renderRoute()}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <button onClick={executeSwap} disabled={btnDisabled} className={`w-full mt-2 py-4 rounded-[1.5rem] font-bold text-xl transition-all ${btnDisabled ? 'bg-slate-200 dark:bg-dark-700 text-slate-400 dark:text-gray-500 cursor-not-allowed' : 'btn-primary'}`}>
+                        {btnText}
+                    </button>
+
+                    <TokenSelectModal isOpen={showTokenModal} onClose={() => setShowTokenModal(false)} tokens={allTokens} onSelect={(t) => {
+                        if(selectingFor === 'in') { if(t.address===tokenOut.address) switchTokens(); else setTokenIn(t); }
+                        else { if(t.address===tokenIn.address) switchTokens(); else setTokenOut(t); }
+                        setShowTokenModal(false);
+                    }} t={t} provider={provider} customTokens={customTokens} setCustomTokens={setCustomTokens} showToast={showToast} />
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 7. 流动性管理总成
+        // ==========================================
+        function PoolManager(props) {
+            const { t } = props;
+            const [view, setView] = useState('list');
+            const [selectedPool, setSelectedPool] = useState(null);
+
+            if (view === 'add') return <AddLiquidityModule {...props} onBack={() => setView('list')} poolDefaults={selectedPool} />;
+            if (view === 'remove') return <RemoveLiquidityModule {...props} onBack={() => setView('list')} pool={selectedPool} />;
+
+            return <PoolListModule {...props} onAdd={(pool) => { setSelectedPool(pool); setView('add'); }} onRemove={(pool) => { setSelectedPool(pool); setView('remove'); }} />;
+        }
+
+        function PoolListModule({ account, provider, isCorrectNetwork, t, onAdd, onRemove }) {
+            const [myPools, setMyPools] = useState([]);
+            const [marketPools, setMarketPools] = useState([]);
+            const [loading, setLoading] = useState(false);
+            const [activeTab, setActiveTab] = useState('my');
+
+            useEffect(() => {
+                const fetchPools = async () => {
+                    if (!provider || !isCorrectNetwork) return;
+                    setLoading(true);
+                    try {
+                        const factory = new ethers.Contract(CONTRACTS.FACTORY, FACTORY_ABI, provider);
+                        const length = await factory.allPairsLength();
+                        
+                        const start = Math.max(0, length.toNumber() - 15);
+                        let poolsArr = [];
+                        
+                        for(let i = length.toNumber() - 1; i >= start; i--) {
+                            const pairAddr = await factory.allPairs(i);
+                            const pair = new ethers.Contract(pairAddr, PAIR_ABI, provider);
+                            const [t0Addr, t1Addr, reserves, totalSupply, myBalance] = await Promise.all([
+                                pair.token0(), pair.token1(), pair.getReserves(), pair.totalSupply(),
+                                account ? pair.balanceOf(account) : Promise.resolve(ethers.BigNumber.from(0))
+                            ]);
+                            
+                            const t0 = new ethers.Contract(t0Addr, ERC20_ABI, provider);
+                            const t1 = new ethers.Contract(t1Addr, ERC20_ABI, provider);
+                            const [s0, d0, s1, d1] = await Promise.all([t0.symbol(), t0.decimals(), t1.symbol(), t1.decimals()]);
+                            
+                            const t0Local = DEFAULT_TOKENS.find(t=>t.address.toLowerCase()===t0Addr.toLowerCase()) || { symbol: s0 };
+                            const t1Local = DEFAULT_TOKENS.find(t=>t.address.toLowerCase()===t1Addr.toLowerCase()) || { symbol: s1 };
+
+                            const r0 = ethers.utils.formatUnits(reserves[0], d0);
+                            const r1 = ethers.utils.formatUnits(reserves[1], d1);
+
+                            poolsArr.push({
+                                address: pairAddr,
+                                token0: { address: t0Addr, symbol: s0, decimals: d0, logoURI: t0Local.logoURI },
+                                token1: { address: t1Addr, symbol: s1, decimals: d1, logoURI: t1Local.logoURI },
+                                reserve0: r0, reserve1: r1,
+                                rate: (Number(r1)/Number(r0)).toFixed(4),
+                                totalSupply: ethers.utils.formatEther(totalSupply),
+                                myBalance: ethers.utils.formatEther(myBalance)
+                            });
+                        }
+                        setMarketPools(poolsArr);
+                        setMyPools(poolsArr.filter(p => Number(p.myBalance) > 0));
+                    } catch (e) { console.error(e); }
+                    setLoading(false);
+                };
+                fetchPools();
+            }, [provider, isCorrectNetwork, account]);
+
+            return (
+                <div className="w-full space-y-4 animate-[fadeIn_0.3s_ease-out]">
+                    <div className="flex gap-2 p-1.5 glass-card rounded-2xl w-full mb-4">
+                        <button onClick={() => setActiveTab('my')} className={`flex-1 py-2 text-sm font-bold rounded-xl transition ${activeTab==='my'?'bg-white dark:bg-dark-700 text-slate-900 dark:text-white shadow-sm':'text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-gray-200'}`}>{t.myPositions}</button>
+                        <button onClick={() => setActiveTab('market')} className={`flex-1 py-2 text-sm font-bold rounded-xl transition ${activeTab==='market'?'bg-white dark:bg-dark-700 text-slate-900 dark:text-white shadow-sm':'text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-gray-200'}`}>{t.marketPools}</button>
+                    </div>
+
+                    <div className="glass-card rounded-[2.5rem] p-6 relative overflow-hidden">
+                        {!account && activeTab === 'my' ? (
+                            <div className="text-center py-10 text-slate-500 dark:text-gray-400 font-bold">{t.connectWallet}</div>
+                        ) : loading ? (
+                            <div className="text-center py-10 text-cyan-500 font-bold flex flex-col items-center gap-3">
+                                <div className="w-8 h-8 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
+                                {t.loadingPools}
+                            </div>
+                        ) : (activeTab === 'my' ? myPools : marketPools).length === 0 ? (
+                            <div className="text-center py-10 text-slate-500 dark:text-gray-400 font-bold">{t.noPositions}</div>
+                        ) : (
+                            <div className="space-y-4 z-10 relative max-h-[60vh] overflow-y-auto pr-2">
+                                {(activeTab === 'my' ? myPools : marketPools).map((pool, idx) => (
+                                    <div key={idx} className="glass-input p-5 rounded-[1.5rem] transition hover:border-cyan-500/50">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex -space-x-3">
+                                                    <TokenIcon token={pool.token0} className="w-8 h-8 rounded-full border-2 border-white dark:border-dark-800 z-10" />
+                                                    <TokenIcon token={pool.token1} className="w-8 h-8 rounded-full border-2 border-white dark:border-dark-800" />
+                                                </div>
+                                                <span className="font-bold text-lg text-slate-900 dark:text-white">{pool.token0.symbol} / {pool.token1.symbol}</span>
+                                            </div>
+                                            {activeTab === 'my' && <div className="text-sm bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 px-3 py-1.5 rounded-xl font-bold">LP: {Number(pool.myBalance).toFixed(4)}</div>}
+                                            {activeTab === 'market' && <button onClick={() => onAdd(pool)} className="btn-primary px-5 py-2 rounded-xl text-sm transition">{t.add}</button>}
+                                        </div>
+                                        
+                                        {activeTab === 'market' && (
+                                            <div className="text-sm font-bold text-slate-700 dark:text-gray-300 mb-4 flex justify-between bg-white/50 dark:bg-dark-800/50 p-3 rounded-2xl">
+                                                <div className="flex items-center gap-2"><TokenIcon token={pool.token0} className="w-5 h-5 rounded-full"/> {Number(pool.reserve0).toLocaleString(undefined, {maximumFractionDigits: 2})} {pool.token0.symbol}</div>
+                                                <div className="flex items-center gap-2"><TokenIcon token={pool.token1} className="w-5 h-5 rounded-full"/> {Number(pool.reserve1).toLocaleString(undefined, {maximumFractionDigits: 2})} {pool.token1.symbol}</div>
+                                            </div>
+                                        )}
+
+                                        <div className="text-sm text-slate-500 dark:text-gray-400 mb-4 bg-white/50 dark:bg-dark-800/50 p-3 rounded-2xl flex justify-between font-medium">
+                                            <span>{t.price}: 1 {pool.token0.symbol} = {pool.rate} {pool.token1.symbol}</span>
+                                        </div>
+
+                                        {activeTab === 'my' && (
+                                            <>
+                                                <div className="text-sm font-bold text-slate-700 dark:text-gray-300 mb-5 flex justify-between bg-white/50 dark:bg-dark-800/50 p-3 rounded-2xl">
+                                                    <div className="flex items-center gap-2"><TokenIcon token={pool.token0} className="w-5 h-5 rounded-full"/> {(Number(pool.reserve0)*(Number(pool.myBalance)/Number(pool.totalSupply))).toFixed(4)} {pool.token0.symbol}</div>
+                                                    <div className="flex items-center gap-2"><TokenIcon token={pool.token1} className="w-5 h-5 rounded-full"/> {(Number(pool.reserve1)*(Number(pool.myBalance)/Number(pool.totalSupply))).toFixed(4)} {pool.token1.symbol}</div>
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <button onClick={() => onAdd(pool)} className="flex-1 btn-primary py-3 rounded-xl transition">{t.add}</button>
+                                                    <button onClick={() => onRemove(pool)} className="flex-1 glass-btn py-3 rounded-xl font-bold text-slate-800 dark:text-white transition">{t.remove}</button>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        {activeTab === 'my' && (
+                            <button onClick={() => onAdd(null)} className="w-full mt-4 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 glass-btn text-cyan-600 dark:text-cyan-400 hover:border-cyan-500 transition shadow-sm">
+                                <IconPlus /> {t.addLiquidity}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // --- 添加流动性 ---
+        function AddLiquidityModule({ account, provider, signer, isCorrectNetwork, t, showToast, allTokens, onBack, slippage, deadline, poolDefaults, setShowSettings, setCustomTokens, customTokens }) {
+            const defaultA = poolDefaults ? allTokens.find(t=>t.address.toLowerCase()===poolDefaults.token0.address.toLowerCase()) || allTokens[0] : allTokens[0];
+            const defaultB = poolDefaults ? allTokens.find(t=>t.address.toLowerCase()===poolDefaults.token1.address.toLowerCase()) || allTokens[1] : allTokens[1];
+
+            const [tokenA, setTokenA] = useState(defaultA);
+            const [tokenB, setTokenB] = useState(defaultB);
+            const [amountA, setAmountA] = useState('');
+            const [amountB, setAmountB] = useState('');
+            const [balanceA, setBalanceA] = useState('0');
+            const [balanceB, setBalanceB] = useState('0');
+            const [reserves, setReserves] = useState(null); 
+            
+            const [isAdding, setIsAdding] = useState(false);
+            const [showModalFor, setShowModalFor] = useState(null);
+
+            useEffect(() => {
+                if(!account || !provider || !isCorrectNetwork) return;
+                const fetchBal = async () => {
+                    const getBal = async (tok) => {
+                        if(tok.isNative) return ethers.utils.formatEther(await provider.getBalance(account));
+                        const c = new ethers.Contract(tok.address, ERC20_ABI, provider);
+                        return ethers.utils.formatUnits(await c.balanceOf(account), tok.decimals);
+                    };
+                    setBalanceA(await getBal(tokenA)); setBalanceB(await getBal(tokenB));
+                };
+                fetchBal();
+            }, [account, provider, isCorrectNetwork, tokenA, tokenB]);
+
+            useEffect(() => {
+                if(!provider || !isCorrectNetwork || !tokenA || !tokenB) return;
+                const fetchReserves = async () => {
+                    try {
+                        const factory = new ethers.Contract(CONTRACTS.FACTORY, FACTORY_ABI, provider);
+                        const pairAddr = await factory.getPair(getRealAddress(tokenA), getRealAddress(tokenB));
+                        if(pairAddr && pairAddr !== ethers.constants.AddressZero) {
+                            const pair = new ethers.Contract(pairAddr, PAIR_ABI, provider);
+                            const r = await pair.getReserves();
+                            const t0 = await pair.token0();
+                            let rA, rB;
+                            if(t0.toLowerCase() === getRealAddress(tokenA).toLowerCase()) {
+                                rA = ethers.utils.formatUnits(r[0], tokenA.decimals); rB = ethers.utils.formatUnits(r[1], tokenB.decimals);
+                            } else {
+                                rA = ethers.utils.formatUnits(r[1], tokenA.decimals); rB = ethers.utils.formatUnits(r[0], tokenB.decimals);
+                            }
+                            setReserves({ rA: Number(rA), rB: Number(rB) });
+                        } else { setReserves({ rA: 0, rB: 0 }); }
+                    } catch(e) { setReserves(null); }
+                };
+                fetchReserves();
+            }, [provider, isCorrectNetwork, tokenA, tokenB]);
+
+            const handleInputA = (val) => { setAmountA(val); if(reserves && reserves.rA > 0 && val > 0) setAmountB(((val * reserves.rB) / reserves.rA).toFixed(6)); };
+            const handleInputB = (val) => { setAmountB(val); if(reserves && reserves.rB > 0 && val > 0) setAmountA(((val * reserves.rA) / reserves.rB).toFixed(6)); };
+
+            const executeAddLiquidity = async () => {
+                if(!signer || !amountA || !amountB) return;
+                setIsAdding(true);
+                try {
+                    const router = new ethers.Contract(CONTRACTS.ROUTER, ROUTER_ABI, signer);
+                    const parsedA = ethers.utils.parseUnits(amountA.toString(), tokenA.decimals);
+                    const parsedB = ethers.utils.parseUnits(amountB.toString(), tokenB.decimals);
+                    const deadlineUnix = Math.floor(Date.now()/1000) + 60*deadline;
+                    
+                    const approveIfNeeded = async (token, amount) => {
+                        if(token.isNative) return;
+                        const contract = new ethers.Contract(token.address, ERC20_ABI, signer);
+                        const allowance = await contract.allowance(account, CONTRACTS.ROUTER);
+                        if(allowance.lt(amount)){
+                            showToast(`${t.approvalNeeded} ${token.symbol}`, 'success');
+                            const tx = await contract.approve(CONTRACTS.ROUTER, ethers.constants.MaxUint256);
+                            await tx.wait();
+                        }
+                    };
+
+                    await approveIfNeeded(tokenA, parsedA); await approveIfNeeded(tokenB, parsedB);
+                    showToast(t.confirming, 'success');
+                    let tx;
+                    if(tokenA.isNative || tokenB.isNative) {
+                        const nativeToken = tokenA.isNative ? tokenA : tokenB;
+                        const ercToken = tokenA.isNative ? tokenB : tokenA;
+                        const nativeAmt = tokenA.isNative ? parsedA : parsedB;
+                        const ercAmt = tokenA.isNative ? parsedB : parsedA;
+                        const ercAmtMin = ercAmt.mul(Math.floor((1 - slippage/100)*1000)).div(1000);
+                        const nativeAmtMin = nativeAmt.mul(Math.floor((1 - slippage/100)*1000)).div(1000);
+                        tx = await router.addLiquidityETH(ercToken.address, ercAmt, ercAmtMin, nativeAmtMin, account, deadlineUnix, { value: nativeAmt });
+                    } else {
+                        const parsedAMin = parsedA.mul(Math.floor((1 - slippage/100)*1000)).div(1000);
+                        const parsedBMin = parsedB.mul(Math.floor((1 - slippage/100)*1000)).div(1000);
+                        tx = await router.addLiquidity(tokenA.address, tokenB.address, parsedA, parsedB, parsedAMin, parsedBMin, account, deadlineUnix);
+                    }
+                    await tx.wait();
+                    showToast(t.txSuccess, 'success'); setAmountA(''); setAmountB(''); onBack();
+                } catch(e) { console.error(e); showToast(t.txFailed, 'error'); } 
+                finally { setIsAdding(false); }
+            };
+
+            const btnDisabled = !account || !amountA || !amountB || isAdding || Number(amountA)>Number(balanceA) || Number(amountB)>Number(balanceB);
+
+            return (
+                <div className="glass-card rounded-[2.5rem] p-4 w-full relative z-10 animate-[fadeIn_0.2s_ease-out]">
+                    <div className="flex justify-between items-center mb-4 px-2">
+                        <button onClick={onBack} className="text-slate-500 hover:text-cyan-500 dark:text-gray-400 dark:hover:text-cyan-400 transition"><IconBack /></button>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t.addLiquidity}</h2>
+                        <button onClick={() => setShowSettings(true)} className="text-slate-500 hover:text-cyan-500 dark:text-gray-400 dark:hover:text-cyan-400 transition"><IconSettings /></button>
+                    </div>
+
+                    <div className="space-y-2">
+                        <div className="glass-input rounded-[2rem] p-5 group">
+                            <div className="flex justify-end text-sm text-slate-500 dark:text-gray-400 font-semibold mb-3"><span>{t.balance}: {Number(balanceA).toFixed(4)}</span></div>
+                            <div className="flex justify-between items-center gap-4">
+                                <input type="number" placeholder="0.0" className="bg-transparent text-3xl font-bold text-slate-900 dark:text-white outline-none w-full flex-1 min-w-0" value={amountA} onChange={e=>handleInputA(e.target.value)} />
+                                <button onClick={() => setShowModalFor('A')} className="glass-btn flex items-center gap-2 rounded-full py-1.5 pl-2 pr-3 whitespace-nowrap">
+                                    <TokenIcon token={tokenA} />
+                                    <span className="font-bold text-slate-800 dark:text-white text-lg">{tokenA.symbol}</span><IconDown />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center text-cyan-500 py-1"><IconPlus /></div>
+
+                        <div className="glass-input rounded-[2rem] p-5 group">
+                            <div className="flex justify-end text-sm text-slate-500 dark:text-gray-400 font-semibold mb-3"><span>{t.balance}: {Number(balanceB).toFixed(4)}</span></div>
+                            <div className="flex justify-between items-center gap-4">
+                                <input type="number" placeholder="0.0" className="bg-transparent text-3xl font-bold text-slate-900 dark:text-white outline-none w-full flex-1 min-w-0" value={amountB} onChange={e=>handleInputB(e.target.value)} />
+                                <button onClick={() => setShowModalFor('B')} className="glass-btn flex items-center gap-2 rounded-full py-1.5 pl-2 pr-3 whitespace-nowrap">
+                                    <TokenIcon token={tokenB} />
+                                    <span className="font-bold text-slate-800 dark:text-white text-lg">{tokenB.symbol}</span><IconDown />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {reserves && reserves.rA > 0 && (
+                        <div className="mt-5 px-5 py-4 rounded-2xl bg-white/40 dark:bg-dark-800/40 border border-white/50 dark:border-white/5 text-sm font-bold flex justify-between text-slate-700 dark:text-gray-300">
+                            <span>{t.price}</span>
+                            <span>1 {tokenA.symbol} = {(reserves.rB/reserves.rA).toFixed(6)} {tokenB.symbol}</span>
+                        </div>
+                    )}
+
+                    <button onClick={executeAddLiquidity} disabled={btnDisabled} className={`w-full mt-4 py-4 rounded-[1.5rem] font-bold text-xl transition-all ${btnDisabled ? 'bg-slate-200 dark:bg-dark-700 text-slate-400 dark:text-gray-500 cursor-not-allowed' : 'btn-primary'}`}>
+                        {isAdding ? t.confirming : t.addLiquidity}
+                    </button>
+
+                    <TokenSelectModal isOpen={!!showModalFor} onClose={() => setShowModalFor(null)} tokens={allTokens} onSelect={(t) => {
+                        if(showModalFor === 'A') { if(t.address===tokenB.address) { setTokenB(tokenA); setTokenA(t); } else setTokenA(t); }
+                        else { if(t.address===tokenA.address) { setTokenA(tokenB); setTokenB(t); } else setTokenB(t); }
+                        setShowModalFor(null);
+                    }} t={t} provider={provider} customTokens={customTokens} setCustomTokens={setCustomTokens} showToast={showToast} />
+                </div>
+            );
+        }
+
+        // --- 移除流动性 (带 Permit) ---
+        function RemoveLiquidityModule({ account, provider, signer, isCorrectNetwork, t, showToast, pool, onBack, slippage, deadline, setShowSettings }) {
+            const [percent, setPercent] = useState(50);
+            const [isRemoving, setIsRemoving] = useState(false);
+
+            const amount0 = (Number(pool.reserve0) * (Number(pool.myBalance) / Number(pool.totalSupply)) * (percent / 100)).toFixed(6);
+            const amount1 = (Number(pool.reserve1) * (Number(pool.myBalance) / Number(pool.totalSupply)) * (percent / 100)).toFixed(6);
+
+            const executeRemove = async () => {
+                if(!signer || percent === 0) return;
+                setIsRemoving(true);
+                try {
+                    const pair = new ethers.Contract(pool.address, PAIR_ABI, signer);
+                    const router = new ethers.Contract(CONTRACTS.ROUTER, ROUTER_ABI, signer);
+                    const deadlineUnix = Math.floor(Date.now()/1000) + 60*deadline;
+                    const lpToRemove = ethers.utils.parseEther(pool.myBalance).mul(percent).div(100);
+
+                    const isToken0WRX = pool.token0.address.toLowerCase() === CONTRACTS.WRX.toLowerCase();
+                    const isToken1WRX = pool.token1.address.toLowerCase() === CONTRACTS.WRX.toLowerCase();
+                    const isNativeInvolved = isToken0WRX || isToken1WRX;
+                    
+                    let permitParams = null;
+                    try {
+                        showToast(t.permitSign, 'success');
+                        const nonce = await pair.nonces(account);
+                        const pairName = await pair.name(); 
+                        
+                        const domain = { name: pairName, version: '1', chainId: CHAIN_INFO.id, verifyingContract: pool.address };
+                        const types = { Permit: [{name:'owner',type:'address'},{name:'spender',type:'address'},{name:'value',type:'uint256'},{name:'nonce',type:'uint256'},{name:'deadline',type:'uint256'}] };
+                        const message = { owner: account, spender: CONTRACTS.ROUTER, value: lpToRemove, nonce, deadline: deadlineUnix };
+                        
+                        const signature = await signer._signTypedData(domain, types, message);
+                        const { v, r, s } = ethers.utils.splitSignature(signature);
+                        permitParams = { v, r, s };
+                    } catch (permitErr) {
+                        console.log("Permit failed, falling back to Approve", permitErr);
+                        showToast(t.approvalNeeded, 'success');
+                        const txApprove = await pair.approve(CONTRACTS.ROUTER, lpToRemove);
+                        await txApprove.wait();
+                    }
+
+                    showToast(t.confirming, 'success');
+                    let txRemove;
+                    
+                    const am0Min = ethers.utils.parseUnits((Number(amount0) * (1 - slippage/100)).toFixed(pool.token0.decimals), pool.token0.decimals);
+                    const am1Min = ethers.utils.parseUnits((Number(amount1) * (1 - slippage/100)).toFixed(pool.token1.decimals), pool.token1.decimals);
+
+                    if(isNativeInvolved) {
+                        const ercTokenAddr = isToken0WRX ? pool.token1.address : pool.token0.address;
+                        const minToken = isToken0WRX ? am1Min : am0Min;
+                        const minETH = isToken0WRX ? am0Min : am1Min;
+                        
+                        if (permitParams) {
+                            txRemove = await router.removeLiquidityETHWithPermit(ercTokenAddr, lpToRemove, minToken, minETH, account, deadlineUnix, false, permitParams.v, permitParams.r, permitParams.s);
+                        } else {
+                            txRemove = await router.removeLiquidityETH(ercTokenAddr, lpToRemove, minToken, minETH, account, deadlineUnix);
+                        }
+                    } else {
+                        if (permitParams) {
+                            txRemove = await router.removeLiquidityWithPermit(pool.token0.address, pool.token1.address, lpToRemove, am0Min, am1Min, account, deadlineUnix, false, permitParams.v, permitParams.r, permitParams.s);
+                        } else {
+                            txRemove = await router.removeLiquidity(pool.token0.address, pool.token1.address, lpToRemove, am0Min, am1Min, account, deadlineUnix);
+                        }
+                    }
+                    await txRemove.wait();
+                    showToast(t.txSuccess, 'success'); onBack();
+                } catch (e) { console.error(e); showToast(t.txFailed, 'error'); }
+                finally { setIsRemoving(false); }
+            };
+
+            return (
+                <div className="glass-card rounded-[2.5rem] p-6 relative z-10 animate-[fadeIn_0.2s_ease-out]">
+                    <div className="flex justify-between items-center mb-6">
+                        <button onClick={onBack} className="text-slate-500 hover:text-cyan-500 dark:text-gray-400 dark:hover:text-cyan-400 transition"><IconBack /></button>
+                        <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t.removeLiquidity}</h2>
+                        <button onClick={() => setShowSettings(true)} className="text-slate-500 hover:text-cyan-500 dark:text-gray-400 dark:hover:text-cyan-400 transition"><IconSettings /></button>
+                    </div>
+
+                    <div className="glass-input rounded-3xl p-8 mb-6 text-center">
+                        <div className="text-7xl font-black text-slate-900 dark:text-white mb-8 drop-shadow-sm">{percent}%</div>
+                        <input type="range" min="1" max="100" value={percent} onChange={e=>setPercent(Number(e.target.value))} className="w-full mb-8" />
+                        <div className="flex gap-3 justify-center">
+                            {[25, 50, 75, 100].map(val => (
+                                <button key={val} onClick={()=>setPercent(val)} className="glass-btn text-cyan-600 dark:text-cyan-400 px-5 py-2 rounded-xl text-sm font-bold transition shadow-sm">
+                                    {val}%
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="space-y-3 mb-8">
+                        <div className="flex justify-between text-sm font-bold text-slate-500 dark:text-gray-400 px-2"><span>{t.youReceive}:</span></div>
+                        <div className="flex justify-between items-center bg-white/50 dark:bg-dark-800/50 p-4 rounded-2xl border border-white/60 dark:border-dark-600">
+                            <span className="font-bold text-2xl text-slate-900 dark:text-white">{amount0}</span>
+                            <div className="flex items-center gap-2 glass-btn px-3 py-1.5 rounded-full shadow-sm">
+                                <TokenIcon token={pool.token0} className="w-6 h-6 rounded-full" />
+                                <span className="font-bold">{pool.token0.symbol}</span>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center bg-white/50 dark:bg-dark-800/50 p-4 rounded-2xl border border-white/60 dark:border-dark-600">
+                            <span className="font-bold text-2xl text-slate-900 dark:text-white">{amount1}</span>
+                            <div className="flex items-center gap-2 glass-btn px-3 py-1.5 rounded-full shadow-sm">
+                                <TokenIcon token={pool.token1} className="w-6 h-6 rounded-full" />
+                                <span className="font-bold">{pool.token1.symbol}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onClick={executeRemove} disabled={isRemoving} className="w-full py-4 rounded-[1.5rem] font-bold text-xl btn-primary disabled:opacity-50 disabled:cursor-not-allowed">
+                        {isRemoving ? t.confirming : t.remove}
+                    </button>
+                </div>
+            );
+        }
+
+        // ==========================================
+        // 8. 代币选择/导入弹窗 (TokenModal)
+        // ==========================================
+        function TokenSelectModal({ isOpen, onClose, tokens, onSelect, t, provider, customTokens, setCustomTokens, showToast }) {
+            const [search, setSearch] = useState('');
+            const [importTokenData, setImportTokenData] = useState(null);
+            const [isSearching, setIsSearching] = useState(false);
+
+            useEffect(() => { if(!isOpen) { setSearch(''); setImportTokenData(null); } }, [isOpen]);
+
+            useEffect(() => {
+                const checkAddress = async () => {
+                    if (ethers.utils.isAddress(search)) {
+                        const exists = tokens.find(t => t.address.toLowerCase() === search.toLowerCase());
+                        if (exists) return; 
+                        setIsSearching(true);
+                        try {
+                            const contract = new ethers.Contract(search, ERC20_ABI, provider);
+                            const [symbol, name, decimals] = await Promise.all([ contract.symbol(), contract.name(), contract.decimals() ]);
+                            setImportTokenData({ address: search, symbol, name, decimals, isNative: false, logoURI: '' });
+                        } catch(e) { setImportTokenData(null); }
+                        finally { setIsSearching(false); }
+                    } else { setImportTokenData(null); }
+                };
+                checkAddress();
+            }, [search, provider, tokens]);
+
+            const handleImport = () => {
+                if(importTokenData) {
+                    const newTokens = [...customTokens, importTokenData];
+                    setCustomTokens(newTokens);
+                    localStorage.setItem('robotx_custom_tokens', JSON.stringify(newTokens));
+                    onSelect(importTokenData);
+                }
+            };
+
+            const addTokenToWallet = async (token) => {
+                if (!window.ethereum || token.isNative) return;
+                try {
+                    let imageURL = token.logoURI;
+                    if (imageURL === 'logo') {
+                        imageURL = window.location.origin + '/assets/images/logo.png';
+                    } else if (imageURL === 'usdt') {
+                        imageURL = 'https://cryptologos.cc/logos/tether-usdt-logo.png';
+                    } else if (imageURL && !imageURL.startsWith('http')) {
+                        imageURL = window.location.origin + imageURL;
+                    }
+
+                    await window.ethereum.request({
+                        method: 'wallet_watchAsset',
+                        params: {
+                            type: 'ERC20',
+                            options: {
+                                address: token.address,
+                                symbol: token.symbol,
+                                decimals: token.decimals,
+                                image: imageURL,
+                            },
+                        },
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
+            };
+
+            const filteredTokens = tokens.filter(tok => tok.symbol.toLowerCase().includes(search.toLowerCase()) || tok.address.toLowerCase() === search.toLowerCase());
+
+            return (
+                <Modal isOpen={isOpen} onClose={onClose} title={t.selectToken}>
+                    <input type="text" placeholder={t.searchPlaceholder} className="w-full glass-input rounded-2xl p-4 mb-4 text-slate-900 dark:text-white font-bold outline-none focus:border-cyan-500 transition shadow-inner" value={search} onChange={(e) => setSearch(e.target.value)} />
+                    <div className="max-h-[50vh] overflow-y-auto space-y-2 pr-2">
+                        {filteredTokens.map((tok, i) => (
+                            <div key={i} className="flex items-center justify-between p-3 hover:bg-white/60 dark:hover:bg-dark-700/50 rounded-2xl cursor-pointer transition border border-transparent hover:border-white dark:hover:border-dark-600">
+                                <div className="flex items-center gap-4 flex-1" onClick={() => onSelect(tok)}>
+                                    <TokenIcon token={tok} className="w-10 h-10 rounded-full shadow-sm" />
+                                    <div>
+                                        <div className="font-bold text-slate-900 dark:text-white text-lg">{tok.symbol}</div>
+                                        <div className="text-xs text-slate-500 dark:text-gray-400 font-medium">{tok.name} {tok.isNative ? '' : `• ${shortenAddress(tok.address)}`}</div>
+                                    </div>
+                                </div>
+                                {!tok.isNative && (
+                                    <button 
+                                        onClick={(e) => { e.stopPropagation(); addTokenToWallet(tok); }}
+                                        className="p-2 text-slate-400 hover:text-cyan-500 hover:bg-cyan-50 dark:hover:bg-cyan-500/10 rounded-xl transition-all"
+                                        title={t.addToWallet}
+                                    >
+                                        <IconWalletAdd />
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        {isSearching && <div className="p-4 text-center text-cyan-500 font-bold text-sm animate-pulse">Searching...</div>}
+                        {importTokenData && (
+                            <div className="flex items-center justify-between p-4 border border-cyan-500/30 bg-cyan-500/10 rounded-2xl mt-2">
+                                <div className="flex items-center gap-3">
+                                    <TokenIcon token={importTokenData} className="w-10 h-10 rounded-full" />
+                                    <div>
+                                        <div className="font-bold text-slate-900 dark:text-white">{importTokenData.symbol}</div>
+                                        <div className="text-xs text-cyan-600 dark:text-cyan-400">{shortenAddress(importTokenData.address)}</div>
+                                    </div>
+                                </div>
+                                <button onClick={handleImport} className="btn-primary px-5 py-2 rounded-xl text-sm transition">{t.importToken}</button>
+                            </div>
+                        )}
+                    </div>
+                </Modal>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
