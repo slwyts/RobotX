@@ -35,6 +35,9 @@
   "team": {
     "myLevel": "我的等级",
     "totalVol": "总业绩",
+    "directReward": "直推收入",
+    "teamReward": "团队奖",
+    "currentRate": "当前比例",
     "direct": "直推",
     "community": "社区",
     "joined": "加入时间",

@@ -12,6 +12,8 @@ type AccountViewResult = {
   orderCount: bigint;
   teamLevel: bigint;
   teamRewardBps: bigint;
+  totalDirectReward: bigint;
+  totalTeamReward: bigint;
 };
 
 type OrderResult = {
@@ -42,6 +44,8 @@ export type RxStakingAccountView = {
   orderCount: bigint;
   teamLevel: bigint;
   teamRewardBps: bigint;
+  totalDirectReward: bigint;
+  totalTeamReward: bigint;
 };
 
 export type RxStakingOrderView = {
@@ -122,6 +126,8 @@ function normalizeAccountView(result: AccountViewResult): RxStakingAccountView {
     orderCount: result.orderCount,
     teamLevel: result.teamLevel,
     teamRewardBps: result.teamRewardBps,
+    totalDirectReward: result.totalDirectReward,
+    totalTeamReward: result.totalTeamReward,
   };
 }
 

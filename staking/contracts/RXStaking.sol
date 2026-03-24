@@ -34,6 +34,8 @@ contract RXStaking is Ownable, ReentrancyGuard {
         address inviter;
         uint256 teamBusiness;
         uint256 directReferrals;
+        uint256 totalDirectReward;
+        uint256 totalTeamReward;
     }
 
     struct Order {
@@ -53,6 +55,8 @@ contract RXStaking is Ownable, ReentrancyGuard {
         uint256 orderCount;
         uint8 teamLevel;
         uint256 teamRewardBps;
+        uint256 totalDirectReward;
+        uint256 totalTeamReward;
     }
 
     struct Announcement {
@@ -375,7 +379,9 @@ contract RXStaking is Ownable, ReentrancyGuard {
             directReferrals: account.directReferrals,
             orderCount: userOrderIds[user].length,
             teamLevel: level,
-            teamRewardBps: teamRewardBps
+            teamRewardBps: teamRewardBps,
+            totalDirectReward: account.totalDirectReward,
+            totalTeamReward: account.totalTeamReward
         });
     }
 
@@ -549,6 +555,7 @@ contract RXStaking is Ownable, ReentrancyGuard {
                 uint256 rewardAmount = Math.mulDiv(profitBase, diffBps, BPS_DENOMINATOR);
                 if (rewardAmount != 0) {
                     if (_tryLimitedNativeTransfer(cursor, rewardAmount)) {
+                        accounts[cursor].totalTeamReward += rewardAmount;
                         emit TeamRewardPaid(cursor, from, orderId, generation, rewardAmount);
                     } else {
                         emit RewardTransferSkipped(cursor, orderId, rewardAmount, 3, generation);
@@ -576,6 +583,7 @@ contract RXStaking is Ownable, ReentrancyGuard {
         }
 
         if (_tryLimitedNativeTransfer(beneficiary, amount)) {
+            accounts[beneficiary].totalDirectReward += amount;
             emit DirectRewardPaid(beneficiary, msg.sender, orderId, amount, rewardType);
         } else {
             emit RewardTransferSkipped(beneficiary, orderId, amount, rewardType, generation);

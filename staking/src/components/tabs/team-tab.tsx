@@ -67,6 +67,8 @@ export function TeamTab() {
   const effectiveInviter = accountView?.inviter && accountView.inviter !== ZERO_ADDRESS ? accountView.inviter : null;
   const teamLabel = accountView ? `V${accountView.teamLevel.toString()}` : "V0";
   const rewardRate = accountView ? `${(Number(accountView.teamRewardBps) / 100).toFixed(2)}%` : "0.00%";
+  const directRewardText = accountView ? formatRxAmount(accountView.totalDirectReward, 2) : "0.00";
+  const teamRewardText = accountView ? formatRxAmount(accountView.totalTeamReward, 2) : "0.00";
   const totalVol = accountView ? formatRxAmount(accountView.teamBusiness, 2) : "0.00";
   const directCount = directMembers.length.toString();
   const communityCount = communityMembers.length.toString();
@@ -78,14 +80,11 @@ export function TeamTab() {
 
   const statCards = [
     { label: t("myLevel"), value: teamLabel, accent: true },
-    { label: t("totalVol"), value: totalVol },
-    { label: t("rewardRate"), value: rewardRate },
+    { label: t("directReward"), value: `${directRewardText} RX` },
+    { label: t("teamReward"), value: `${teamRewardText} RX`, subtitle: `${t("currentRate")} ${rewardRate}` },
     { label: t("boundInviter"), value: inviterText },
     { label: t("teamBusiness"), value: `${totalVol} RX` },
     { label: t("poolBalance"), value: `${poolBalance} RX` },
-    // { label: t("networkActiveStaked"), value: `${totalActiveStaked} RX` },
-    // { label: t("teamOrders"), value: activeOrderCount },
-    // { label: t("pendingStaticReward"), value: `${pendingRewardText} RX`, accent: true },
   ];
 
   const renderMemberRow = (member: RxStakingMemberProfile, showGeneration: boolean) => {
@@ -130,6 +129,11 @@ export function TeamTab() {
             <div className={`font-rajdhani text-[22px] font-bold ${card.accent ? "text-brandLight dark:text-primary" : ""}`}>
               {card.value}
             </div>
+            {card.subtitle && (
+              <div className="text-[10px] text-light-textMuted dark:text-dark-textMuted mt-0.5">
+                {card.subtitle}
+              </div>
+            )}
           </GlassPanel>
         ))}
       </div>

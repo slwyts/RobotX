@@ -35,6 +35,9 @@
   "team": {
     "myLevel": "My Level",
     "totalVol": "Total Vol.",
+    "directReward": "Direct Reward",
+    "teamReward": "Team Reward",
+    "currentRate": "Current rate",
     "direct": "Direct",
     "community": "Community",
     "joined": "Joined",
