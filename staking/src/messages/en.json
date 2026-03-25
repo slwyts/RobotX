@@ -164,6 +164,9 @@
     "adminPanel": "Admin Console",
     "inviteLinkCopied": "Invite link copied.",
     "inviteLinkCopyFailed": "Failed to copy invite link.",
+    "manualCopyTitle": "Copy Invite Link Manually",
+    "manualCopyHint": "Your wallet restricts clipboard access. Please long-press the link below to copy it manually.",
+    "close": "Close",
     "connectWalletFirst": "Connect your wallet first.",
     "uplineMustBeBound": "This inviter has not bound an inviter yet.",
     "autoBindSuccess": "Auto-bind request sent from invite link."

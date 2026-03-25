@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -14,6 +15,7 @@ import {
   CheckCircle,
   CircleDollarSign,
   Copy,
+  X,
   Twitter,
   MessageCircle,
   Send,
@@ -57,7 +59,9 @@ export function MineTab({ onOpenAdmin, onSettled, refreshSignal }: { onOpenAdmin
   const [settlingOrderId, setSettlingOrderId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [autoBindAttempted, setAutoBindAttempted] = useState(false);
+  const [copyFailLink, setCopyFailLink] = useState<string | null>(null);
   const snapshotFetchedAt = useRef(Date.now() / 1000);
+  const lastCopyAt = useRef(0);
   const [nowSec, setNowSec] = useState(() => Date.now() / 1000);
 
   const menuItems = [
@@ -281,11 +285,20 @@ export function MineTab({ onOpenAdmin, onSettled, refreshSignal }: { onOpenAdmin
     }
 
     const inviteLink = `${window.location.origin}${pathname}?ref=${account}`;
+    const now = Date.now();
+    const forceModal = now - lastCopyAt.current < 3000;
+    lastCopyAt.current = now;
+
+    if (forceModal) {
+      setCopyFailLink(inviteLink);
+      return;
+    }
+
     try {
       await navigator.clipboard.writeText(inviteLink);
       showToast(t("inviteLinkCopied"));
     } catch {
-      showToast(t("inviteLinkCopyFailed"), "error");
+      setCopyFailLink(inviteLink);
     }
   };
 
@@ -326,6 +339,33 @@ export function MineTab({ onOpenAdmin, onSettled, refreshSignal }: { onOpenAdmin
 
   return (
     <div className="animate-slide-up">
+      {/* Manual copy modal — rendered via portal to escape overflow-hidden */}
+      {copyFailLink ? createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-md px-6" onClick={() => setCopyFailLink(null)}>
+          <div className="w-full max-w-sm rounded-2xl bg-light-bg dark:bg-dark-bg border border-light-border dark:border-dark-border p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-3">
+              <span className="font-semibold text-sm">{t("manualCopyTitle")}</span>
+              <button onClick={() => setCopyFailLink(null)} className="text-light-textMuted dark:text-dark-textMuted"><X size={16} /></button>
+            </div>
+            <p className="text-xs text-light-textMuted dark:text-dark-textMuted mb-3">{t("manualCopyHint")}</p>
+            <textarea
+              readOnly
+              value={copyFailLink}
+              rows={3}
+              onFocus={(e) => e.target.select()}
+              onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+              className="w-full rounded-lg border border-light-border dark:border-dark-border bg-light-input dark:bg-dark-input px-3 py-2 text-xs font-mono break-all outline-none resize-none"
+            />
+            <button
+              onClick={() => setCopyFailLink(null)}
+              className="mt-4 w-full rounded-xl bg-brandLight dark:bg-primary py-2.5 text-sm font-semibold text-white"
+            >
+              {t("close")}
+            </button>
+          </div>
+        </div>,
+        document.body,
+      ) : null}
       {/* Total Asset */}
       <div className="text-center py-2 pb-5">
         <div className="text-xs text-light-textMuted dark:text-dark-textMuted mb-1 font-medium">

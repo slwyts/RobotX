@@ -164,6 +164,9 @@
     "adminPanel": "管理员后台",
     "inviteLinkCopied": "邀请链接已复制。",
     "inviteLinkCopyFailed": "邀请链接复制失败。",
+    "manualCopyTitle": "手动复制邀请链接",
+    "manualCopyHint": "您的钱包限制了剪贴板访问，请长按下方链接手动复制。",
+    "close": "关闭",
     "connectWalletFirst": "请先连接钱包。",
     "uplineMustBeBound": "该上级还未绑定邀请人，无法绑定。",
     "autoBindSuccess": "已根据邀请链接自动发起绑定。"
