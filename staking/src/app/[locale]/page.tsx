@@ -20,6 +20,8 @@ export default function HomePage() {
   const locale = useLocale();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("stake");
+  const [txRevision, setTxRevision] = useState(0);
+  const bumpRevision = () => setTxRevision((r) => r + 1);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -41,10 +43,10 @@ export default function HomePage() {
           <Header />
 
           <main className="flex-1 overflow-y-auto p-5 pb-[90px] z-[2] scroll-smooth no-scrollbar relative">
-            <div className={activeTab === "stake" ? "" : "hidden"}><StakeTab onNavigate={setActiveTab} /></div>
+            <div className={activeTab === "stake" ? "" : "hidden"}><StakeTab onNavigate={setActiveTab} onStaked={bumpRevision} refreshSignal={txRevision} /></div>
             <div className={activeTab === "team" ? "" : "hidden"}><TeamTab /></div>
             <div className={activeTab === "news" ? "" : "hidden"}><NewsTab /></div>
-            <div className={activeTab === "mine" ? "" : "hidden"}><Suspense><MineTab onOpenAdmin={() => router.push(`/${locale}/admin`)} /></Suspense></div>
+            <div className={activeTab === "mine" ? "" : "hidden"}><Suspense><MineTab onOpenAdmin={() => router.push(`/${locale}/admin`)} onSettled={bumpRevision} refreshSignal={txRevision} /></Suspense></div>
           </main>
 
           <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />

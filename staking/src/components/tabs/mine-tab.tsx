@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -41,7 +41,7 @@ const socialLinks = [
   { icon: MessageCircle, href: "#" },
 ];
 
-export function MineTab({ onOpenAdmin }: { onOpenAdmin: () => void }) {
+export function MineTab({ onOpenAdmin, onSettled, refreshSignal }: { onOpenAdmin: () => void; onSettled?: () => void; refreshSignal?: number }) {
   const t = useTranslations("mine");
   const pathname = usePathname();
   const router = useRouter();
@@ -57,6 +57,8 @@ export function MineTab({ onOpenAdmin }: { onOpenAdmin: () => void }) {
   const [settlingOrderId, setSettlingOrderId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [autoBindAttempted, setAutoBindAttempted] = useState(false);
+  const snapshotFetchedAt = useRef(Date.now() / 1000);
+  const [nowSec, setNowSec] = useState(() => Date.now() / 1000);
 
   const menuItems = [
     { icon: Globe, labelKey: "officialWebsite", href: "https://www.robotxhub.ai/" },
@@ -82,6 +84,7 @@ export function MineTab({ onOpenAdmin }: { onOpenAdmin: () => void }) {
       setAccountView(snapshot.account);
       setOrders(snapshot.orders);
       setBoundAddress(snapshot.account?.inviter && snapshot.account.inviter !== "0x0000000000000000000000000000000000000000" ? snapshot.account.inviter : null);
+      snapshotFetchedAt.current = Date.now() / 1000;
     } catch {
       showToast(t("loadFailed"), "error");
     } finally {
@@ -91,7 +94,12 @@ export function MineTab({ onOpenAdmin }: { onOpenAdmin: () => void }) {
 
   useEffect(() => {
     void loadSnapshot();
-  }, [account]);
+  }, [account, refreshSignal]);
+
+  useEffect(() => {
+    const id = setInterval(() => setNowSec(Date.now() / 1000), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     const inviteRef = searchParams.get("ref");
@@ -149,6 +157,7 @@ export function MineTab({ onOpenAdmin }: { onOpenAdmin: () => void }) {
     t,
   ]);
 
+  // kept for non-display uses if any; live display uses liveTotalRx below
   const totalAssetValue = useMemo(() => {
     return orders.reduce((total, order) => {
       if (order.settled) {
@@ -159,6 +168,15 @@ export function MineTab({ onOpenAdmin }: { onOpenAdmin: () => void }) {
       return total + grossValue;
     }, 0n);
   }, [orders]);
+
+  // real-time interpolated total (updates every second)
+  const liveTotalRx = orders.reduce((acc, order) => {
+    if (order.settled) return acc;
+    const endAt = Number(order.endAt);
+    const extraSec = Math.max(0, Math.min(nowSec, endAt) - Math.min(snapshotFetchedAt.current, endAt));
+    const liveExtra = (Number(order.principalAmount) / 1e18) * 0.15 / 2592000 * extraSec;
+    return acc + Number(order.principalAmount) / 1e18 + Number(order.pendingStaticReward) / 1e18 + liveExtra;
+  }, 0);
 
   const isAdminAccount = Boolean(
     account && contractOwner && account.toLowerCase() === contractOwner.toLowerCase(),
@@ -247,6 +265,7 @@ export function MineTab({ onOpenAdmin }: { onOpenAdmin: () => void }) {
     try {
       await settleOrder(orderId);
       await Promise.all([refreshWalletState(), loadSnapshot()]);
+      onSettled?.();
       showToast(t("settleSuccess"));
     } catch {
       showToast(t("settleFailed"), "error");
@@ -313,7 +332,7 @@ export function MineTab({ onOpenAdmin }: { onOpenAdmin: () => void }) {
           {t("totalAsset")}
         </div>
         <div className="font-rajdhani text-[38px] font-bold">
-          {formatRxAmount(totalAssetValue, 2)}<span className="text-xl text-light-textMuted dark:text-dark-textMuted font-medium"> RX</span>
+          {liveTotalRx.toFixed(4)}<span className="text-xl text-light-textMuted dark:text-dark-textMuted font-medium"> RX</span>
         </div>
       </div>
 
@@ -385,9 +404,11 @@ export function MineTab({ onOpenAdmin }: { onOpenAdmin: () => void }) {
         </div>
       ) : (
         orders.map((order) => {
-          const grossValue = order.principalAmount + order.pendingStaticReward;
-          const currentValue = grossValue;
-          const earned = currentValue > order.amountIn ? currentValue - order.amountIn : 0n;
+          const endAt = Number(order.endAt);
+          const extraSec = order.settled ? 0 : Math.max(0, Math.min(nowSec, endAt) - Math.min(snapshotFetchedAt.current, endAt));
+          const liveExtra = (Number(order.principalAmount) / 1e18) * 0.15 / 2592000 * extraSec;
+          const liveCurrentValue = Number(order.principalAmount) / 1e18 + Number(order.pendingStaticReward) / 1e18 + liveExtra;
+          const liveEarned = liveCurrentValue - Number(order.amountIn) / 1e18;
 
           return (
             <div key={order.id.toString()} className="bg-light-input dark:bg-dark-input rounded-xl p-4 mb-3 border-l-4 border-brandLight dark:border-primary shadow-sm">
@@ -411,7 +432,7 @@ export function MineTab({ onOpenAdmin }: { onOpenAdmin: () => void }) {
                     {t("currentValue")}
                   </div>
                   <div className="font-rajdhani text-sm font-bold text-brandLight dark:text-primary">
-                    {formatRxAmount(currentValue, 2)} RX
+                    {liveCurrentValue.toFixed(4)} RX
                   </div>
                 </div>
               </div>
@@ -420,7 +441,9 @@ export function MineTab({ onOpenAdmin }: { onOpenAdmin: () => void }) {
                   <span>
                     {t("unlocksIn")}: {order.settled ? t("settled") : formatRemaining(order.endAt)}
                   </span>
-                  <span className="text-successLight dark:text-success">+{formatRxAmount(earned, 2)} RX</span>
+                  <span className={liveEarned >= 0 ? "text-successLight dark:text-success" : "text-dangerLight dark:text-danger"}>
+                    {liveEarned >= 0 ? "+" : ""}{liveEarned.toFixed(4)} RX
+                  </span>
                 </div>
                 {!order.settled ? (
                   <button

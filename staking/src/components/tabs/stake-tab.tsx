@@ -14,11 +14,11 @@ const STAKE_LOCK_DAYS = 30;
 const DAILY_YIELD = 0.5;
 const FRONTEND_MIN_STAKE = 3000;
 
-export function StakeTab({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
+export function StakeTab({ onNavigate, onStaked, refreshSignal }: { onNavigate: (tab: TabId) => void; onStaked?: () => void; refreshSignal?: number }) {
   const t = useTranslations("stake");
   const locale = useLocale();
   const { showToast } = useToast();
-  const { account, nativeBalance, targetChain, isTargetChain, hasInjectedWallet, connectWallet, switchToTargetChain } = useWallet();
+  const { account, nativeBalance, targetChain, isTargetChain, hasInjectedWallet, connectWallet, switchToTargetChain, refreshWalletState } = useWallet();
   const [networkStaked, setNetworkStaked] = useState("0.0000");
   const [amount, setAmount] = useState("3000");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,7 +53,7 @@ export function StakeTab({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
       active = false;
       clearInterval(id);
     };
-  }, []);
+  }, [refreshSignal]);
 
   useEffect(() => {
     let active = true;
@@ -125,8 +125,10 @@ export function StakeTab({ onNavigate }: { onNavigate: (tab: TabId) => void }) {
     setIsSubmitting(true);
     try {
       await stakeRx(STAKE_LOCK_DAYS, amount);
+      await refreshWalletState();
       const balance = await readContractBalance();
       setNetworkStaked(formatRxAmount(balance, 4));
+      onStaked?.();
       showToast(t("stakeSuccess"));
     } catch {
       showToast(t("stakeFailed"), "error");
