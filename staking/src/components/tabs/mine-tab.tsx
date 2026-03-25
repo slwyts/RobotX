@@ -448,7 +448,7 @@ export function MineTab({ onOpenAdmin, onSettled, refreshSignal }: { onOpenAdmin
           const extraSec = order.settled ? 0 : Math.max(0, Math.min(nowSec, endAt) - Math.min(snapshotFetchedAt.current, endAt));
           const liveExtra = (Number(order.principalAmount) / 1e18) * 0.15 / 2592000 * extraSec;
           const liveCurrentValue = Number(order.principalAmount) / 1e18 + Number(order.pendingStaticReward) / 1e18 + liveExtra;
-          const liveEarned = liveCurrentValue - Number(order.amountIn) / 1e18;
+          const liveEarned = liveCurrentValue - Number(order.principalAmount) / 1e18;
 
           return (
             <div key={order.id.toString()} className="bg-light-input dark:bg-dark-input rounded-xl p-4 mb-3 border-l-4 border-brandLight dark:border-primary shadow-sm">
@@ -482,7 +482,7 @@ export function MineTab({ onOpenAdmin, onSettled, refreshSignal }: { onOpenAdmin
                     {t("unlocksIn")}: {order.settled ? t("settled") : formatRemaining(order.endAt)}
                   </span>
                   <span className="text-successLight dark:text-success">
-                    +{Math.max(0, liveEarned).toFixed(4)} RX
+                    +{liveEarned.toFixed(4)} RX
                   </span>
                 </div>
                 {!order.settled ? (
