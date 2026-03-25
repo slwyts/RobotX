@@ -1,6 +1,8 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import { useLocale } from "next-intl";
+import { useRouter } from "next/navigation";
 import { Header } from "@/components/header";
 import { BottomNav } from "@/components/bottom-nav";
 import { ParticleBg } from "@/components/particle-bg";
@@ -11,11 +13,12 @@ import { StakeTab } from "@/components/tabs/stake-tab";
 import { TeamTab } from "@/components/tabs/team-tab";
 import { NewsTab } from "@/components/tabs/news-tab";
 import { MineTab } from "@/components/tabs/mine-tab";
-import { AdminTab } from "@/components/tabs/admin-tab";
 
-export type TabId = "stake" | "team" | "news" | "mine" | "admin";
+export type TabId = "stake" | "team" | "news" | "mine";
 
 export default function HomePage() {
+  const locale = useLocale();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("stake");
 
   useEffect(() => {
@@ -41,8 +44,7 @@ export default function HomePage() {
             <div className={activeTab === "stake" ? "" : "hidden"}><StakeTab onNavigate={setActiveTab} /></div>
             <div className={activeTab === "team" ? "" : "hidden"}><TeamTab /></div>
             <div className={activeTab === "news" ? "" : "hidden"}><NewsTab /></div>
-            <div className={activeTab === "mine" ? "" : "hidden"}><Suspense><MineTab onOpenAdmin={() => setActiveTab("admin")} /></Suspense></div>
-            <div className={activeTab === "admin" ? "" : "hidden"}><AdminTab onBack={() => setActiveTab("mine")} /></div>
+            <div className={activeTab === "mine" ? "" : "hidden"}><Suspense><MineTab onOpenAdmin={() => router.push(`/${locale}/admin`)} /></Suspense></div>
           </main>
 
           <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
