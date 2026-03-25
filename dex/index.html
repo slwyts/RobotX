@@ -132,6 +132,7 @@
         // 1. 常量与配置项 (RobotX Mainnet)
         // ==========================================
         const CHAIN_INFO = { id: 2679, hex: '0xa77', name: 'RobotX Mainnet', rpc: 'https://rpc.robotxhub.ai', symbol: 'RX', decimals: 18 };
+        const OPEN_TIME = new Date('2026-03-25T16:00:00+08:00').getTime();
         const CONTRACTS = {
             FACTORY: '0x4fdFDBDB98Ddcf9705BBD4f9EDf59728318f52fE',
             ROUTER: '0x9b9afbe2a70F8EE507f8faBE41114Ad5d9C8A0A4',
@@ -250,7 +251,8 @@
                 pooled: '已存入', remove: '移除', add: '添加', loadingPools: '加载中...', 
                 youReceive: '预估获得', minReceive: '最低获得', priceImpact: '价格影响', route: '智能路由',
                 wrap: '打包 (Wrap)', unwrap: '解包 (Unwrap)', permitSign: '免Gas签名授权中...', addToWallet: '添加至钱包',
-                ratioLocked: '同步', ratioUnlocked: '独立', emptyPool: '新交易对', impliedPrice: '汇率'
+                ratioLocked: '同步', ratioUnlocked: '独立', emptyPool: '新交易对', impliedPrice: '汇率',
+                notOpen: '未开盘'
             },
             en: {
                 swap: 'Swap', pool: 'Pool', connectWallet: 'Connect Wallet', wrongNetwork: 'Switch Network',
@@ -264,7 +266,8 @@
                 pooled: 'Pooled', remove: 'Remove', add: 'Add', loadingPools: 'Loading...', 
                 youReceive: 'Est. Receive', minReceive: 'Minimum Received', priceImpact: 'Price Impact', route: 'Smart Route',
                 wrap: 'Wrap', unwrap: 'Unwrap', permitSign: 'Sign Permit (Gasless)...', addToWallet: 'Add to Wallet',
-                ratioLocked: 'Sync', ratioUnlocked: 'Independent', emptyPool: 'New Pair', impliedPrice: 'Rate'
+                ratioLocked: 'Sync', ratioUnlocked: 'Independent', emptyPool: 'New Pair', impliedPrice: 'Rate',
+                notOpen: 'Not Open Yet'
             }
         };
 
@@ -688,15 +691,17 @@
             };
 
             const isInsufficient = Number(amountIn) > Number(balanceIn);
+            const isBeforeOpen = Date.now() < OPEN_TIME;
             const impactNum = quoteDetails && quoteDetails.priceImpact !== '< 0.01' ? Number(quoteDetails.priceImpact) : 0;
             const impactTooHigh = !isDirectAction && impactNum > slippage;
-            const btnDisabled = !account || !isCorrectNetwork || !amountIn || isFetchingQuote || isSwapping || isInsufficient || (!amountOut && !isDirectAction) || poolTooShallow || impactTooHigh;
+            const btnDisabled = !account || !isCorrectNetwork || !amountIn || isFetchingQuote || isSwapping || isInsufficient || (!amountOut && !isDirectAction) || poolTooShallow || impactTooHigh || isBeforeOpen;
             
             let btnText = t.swapBtn;
             if (isWrap) btnText = t.wrap;
             else if (isUnwrap) btnText = t.unwrap;
 
-            if (!account) btnText = t.connectWallet;
+            if (isBeforeOpen) btnText = t.notOpen;
+            else if (!account) btnText = t.connectWallet;
             else if (!isCorrectNetwork) btnText = t.wrongNetwork;
             else if (isInsufficient) btnText = t.insufficientBalance;
             else if (isSwapping) btnText = t.confirming;
