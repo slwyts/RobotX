@@ -481,8 +481,8 @@ export function MineTab({ onOpenAdmin, onSettled, refreshSignal }: { onOpenAdmin
                   <span>
                     {t("unlocksIn")}: {order.settled ? t("settled") : formatRemaining(order.endAt)}
                   </span>
-                  <span className={liveEarned >= 0 ? "text-successLight dark:text-success" : "text-dangerLight dark:text-danger"}>
-                    {liveEarned >= 0 ? "+" : ""}{liveEarned.toFixed(4)} RX
+                  <span className="text-successLight dark:text-success">
+                    +{Math.max(0, liveEarned).toFixed(4)} RX
                   </span>
                 </div>
                 {!order.settled ? (
